@@ -1,0 +1,5 @@
+fatfs_sd.c
+SDカードにspiでアクセスするための関数を実装する。
+
+user_diskio.c
+fatfs_sd.cで実装した関数をdisoko.cから使えるように登録する。
