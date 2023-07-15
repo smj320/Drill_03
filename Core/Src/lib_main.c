@@ -8,6 +8,7 @@
 #include "time.h"
 #include "FatFs.h"
 #include "drill_mon.h"
+#include "stdio.h"
 
 /**
  * ペリフェラル用ハンドル
@@ -40,7 +41,7 @@ _Noreturn void drill_loop(DRILL_STATUS *dst) {
         make_HK(dst, fName);
 
         //UARTにデータ転送
-        HAL_UART_Transmit_DMA(&huart2, dst->flm.buf, 80);
+        HAL_UART_Transmit_DMA(&huart2, dst->flm.buf, N_FLAME);
 
         //初回動作または時刻の切れ目でファイルオープン
         if ((dst->TI % FILE_RENEW_SEC) == 0 || dst->isFirst == 1) {
@@ -53,7 +54,7 @@ _Noreturn void drill_loop(DRILL_STATUS *dst) {
 
         //データをSDカードに出力する。
         UINT bw;
-        f_write(&fil, dst->flm.buf, strlen((char *) dst->flm.buf), &bw);
+        f_write(&fil, dst->flm.buf, N_FLAME, &bw);
         f_sync(&fil);
 
         //初回フラグクリア
@@ -124,7 +125,8 @@ void make_HK(DRILL_STATUS *dst, uint8_t *fname) {
     uint8_t sum, i;
 
     //ファイル名
-    itoa(dst->TI, (char *) fname, 16);
+    //sprintf(fname,"%08d.bin",dst->TI/FILE_RENEW_SEC);
+    itoa(dst->TI/FILE_RENEW_SEC+10000000, (char *) fname, 10);
     strcat((char *) fname, ".bin");
 
     //バッファクリア
@@ -137,7 +139,7 @@ void make_HK(DRILL_STATUS *dst, uint8_t *fname) {
     dst->flm.elm.TI = __builtin_bswap32(dst->TI);
 
     //ファイル状態
-    dst->flm.elm.STAT = ((dst->fMount & 0x01) << 1) + ((dst->fOpen & 0x01) < 0);
+    dst->flm.elm.STAT =  ((dst->fOpen & 0x01) << 1) | ((dst->fMount)&0x01);
 
     //位置指定
     dst->flm.elm.PDU_V = 3;
