@@ -8,7 +8,7 @@
 #include "time.h"
 #include "FatFs.h"
 #include "drill_mon.h"
-#include "stdio.h"
+#include "mcp3424.h"
 
 /**
  * ペリフェラル用ハンドル
@@ -35,7 +35,7 @@ _Noreturn void drill_loop(DRILL_STATUS *dst) {
         //1PPSトリガ待機とフラグリセット
         while (dst->F_PPS != 1);
         dst->F_PPS = 0;
-        //HAL_GPIO_WritePin(CPU_MON_GPIO_Port, CPU_MON_Pin, led++ & 0x01);
+        HAL_GPIO_TogglePin(LED_B_GPIO_Port, LED_B_Pin);
 
         //HKデータ編集
         make_HK(dst, fName);
@@ -59,8 +59,6 @@ _Noreturn void drill_loop(DRILL_STATUS *dst) {
 
         //初回フラグクリア
         dst->isFirst = 0;
-        //HAL_GPIO_WritePin(LED_B_GPIO_Port, LED_B_Pin, GPIO_PIN_RESET);
-
     }
 }
 
@@ -123,14 +121,16 @@ void check_GPIO() {
 void make_HK(DRILL_STATUS *dst, uint8_t *fname) {
 
     uint8_t sum, i;
+    uint16_t data;
+    int rtc;
 
     //ファイル名
     //sprintf(fname,"%08d.bin",dst->TI/FILE_RENEW_SEC);
-    itoa(dst->TI/FILE_RENEW_SEC+10000000, (char *) fname, 10);
+    itoa(dst->TI / FILE_RENEW_SEC + 10000000, (char *) fname, 10);
     strcat((char *) fname, ".bin");
 
     //バッファクリア
-    memset(dst->flm.buf,0,sizeof(dst->flm.buf));
+    memset(dst->flm.buf, 0, sizeof(dst->flm.buf));
 
     //フレームシンクワード
     dst->flm.elm.FS = __builtin_bswap32(0xEB9038C7);
@@ -139,7 +139,7 @@ void make_HK(DRILL_STATUS *dst, uint8_t *fname) {
     dst->flm.elm.TI = __builtin_bswap32(dst->TI);
 
     //ファイル状態
-    dst->flm.elm.STAT =  ((dst->fOpen & 0x01) << 1) | ((dst->fMount)&0x01);
+    dst->flm.elm.STAT = ((dst->fOpen & 0x01) << 1) | ((dst->fMount) & 0x01);
 
     //位置指定
     dst->flm.elm.PDU_V = 3;
@@ -149,28 +149,63 @@ void make_HK(DRILL_STATUS *dst, uint8_t *fname) {
     dst->flm.elm.SYS_T = 7;
     dst->flm.elm.SYS_H = 8;
     dst->flm.elm.SYS_P = 9;
-    dst->flm.elm.GND_P = __builtin_bswap16(10);
+    dst->flm.elm.GND_P = 10;
     dst->flm.elm.MOT_V = 11;
     dst->flm.elm.MOT_I = 12;
     dst->flm.elm.MOT_T = 13;
     dst->flm.elm.GEA_T = 14;
     dst->flm.elm.MOT_R = 15;
-    dst->flm.elm.LIQ1_T = __builtin_bswap16(16);
-    dst->flm.elm.LIQ1_P = __builtin_bswap16(17);
-    dst->flm.elm.LIQ2_T = __builtin_bswap16(18);
-    dst->flm.elm.BOA_D = __builtin_bswap16(19);
-    dst->flm.elm.GRA_X = __builtin_bswap16(20);
-    dst->flm.elm.GRA_Y = __builtin_bswap16(21);
-    dst->flm.elm.GRA_Z = __builtin_bswap16(22);
-    dst->flm.elm.ACC_X = __builtin_bswap16(23);
-    dst->flm.elm.ACC_Y = __builtin_bswap16(24);
-    dst->flm.elm.ACC_Z = __builtin_bswap16(25);
-    dst->flm.elm.ROT_X = __builtin_bswap16(26);
-    dst->flm.elm.ROT_Y = __builtin_bswap16(27);
-    dst->flm.elm.ROT_Z = __builtin_bswap16(28);
-    dst->flm.elm.MAG_X = __builtin_bswap16(29);
-    dst->flm.elm.MAG_Y = __builtin_bswap16(30);
-    dst->flm.elm.MAG_Z = __builtin_bswap16(31);
+    dst->flm.elm.LIQ1_T = 16;
+    dst->flm.elm.LIQ1_P = 17;
+    dst->flm.elm.LIQ2_T = 18;
+    dst->flm.elm.BOA_D = 19;
+    dst->flm.elm.GRA_X = 20;
+    dst->flm.elm.GRA_Y = 21;
+    dst->flm.elm.GRA_Z = 22;
+    dst->flm.elm.ACC_X = 23;
+    dst->flm.elm.ACC_Y = 24;
+    dst->flm.elm.ACC_Z = 25;
+    dst->flm.elm.ROT_X = 26;
+    dst->flm.elm.ROT_Y = 27;
+    dst->flm.elm.ROT_Z = 28;
+    dst->flm.elm.MAG_X = 29;
+    dst->flm.elm.MAG_Y = 30;
+    dst->flm.elm.MAG_Z = 31;
+
+    //MCP3424 ad0=0,ad1=0
+    if (MCP3424_Read(MCP3424_HV_ADDR, MOT_V_CH, &data)) dst->flm.elm.MOT_V = data >> 6;
+    //if (MCP3424_Read(MCP3424_HV_ADDR, MOT_I_CH, &data)) dst->flm.elm.MOT_I = data >> 6;
+    //if (MCP3424_Read(MCP3424_HV_ADDR, MOT_R_CH, &data)) dst->flm.elm.MOT_R= data >> 6;
+    //if (MCP3424_Read(MCP3424_HV_ADDR, PDU_V_CH, &data)) dst->flm.elm.PDU_V = data >> 6;
+    //MCP3424 ad0=1,ad1=0
+    //if (MCP3424_Read(MCP3424_PT100_ADDR, BAT_T_CH, &data)) dst->flm.elm.BAT_T = data >> 6;
+    //if (MCP3424_Read(MCP3424_PT100_ADDR, LIQ2_T_CH, &data)) dst->flm.elm.LIQ2_T = data;
+    //if (MCP3424_Read(MCP3424_PT100_ADDR, MOT_T_CH, &data)) dst->flm.elm.MOT_T= data >> 6;
+    //if (MCP3424_Read(MCP3424_PT100_ADDR, GEA_T_CH, &data)) dst->flm.elm.GEA_T = data >> 6;
+    //MCP3424 d0=0,ad1=1
+    //if (MCP3424_Read(MCP3424_LVDT_ADDR, GND_P_CH, &data)) dst->flm.elm.GND_P = data;
+    //if (MCP3424_Read(MCP3424_LVDT_ADDR, BAT_V_CH, &data)) dst->flm.elm.BAT_V = data >> 6;
+    //if (MCP3424_Read(MCP3424_LVDT_ADDR, LIQ1_P_CH, &data)) dst->flm.elm.LIQ1_P= data;
+    //if (MCP3424_Read(MCP3424_LVDT_ADDR, LIQ1_T_CH, &data)) dst->flm.elm.LIQ1_T = data;
+
+    //エンコード
+    dst->flm.elm.GND_P = __builtin_bswap16(dst->flm.elm.GND_P);
+    dst->flm.elm.LIQ1_T = __builtin_bswap16(dst->flm.elm.LIQ1_T);
+    dst->flm.elm.LIQ1_P = __builtin_bswap16(dst->flm.elm.LIQ1_P);
+    dst->flm.elm.LIQ2_T = __builtin_bswap16(dst->flm.elm.LIQ2_T);
+    dst->flm.elm.BOA_D = __builtin_bswap16(dst->flm.elm.BOA_D);
+    dst->flm.elm.GRA_X = __builtin_bswap16(dst->flm.elm.GRA_X);
+    dst->flm.elm.GRA_Y = __builtin_bswap16(dst->flm.elm.GRA_Y);
+    dst->flm.elm.GRA_Z = __builtin_bswap16(dst->flm.elm.GRA_Z);
+    dst->flm.elm.ACC_X = __builtin_bswap16(dst->flm.elm.ACC_X);
+    dst->flm.elm.ACC_Y = __builtin_bswap16(dst->flm.elm.ACC_Y);
+    dst->flm.elm.ACC_Z = __builtin_bswap16(dst->flm.elm.ACC_Z);
+    dst->flm.elm.ROT_X = __builtin_bswap16(dst->flm.elm.ROT_X);
+    dst->flm.elm.ROT_Y = __builtin_bswap16(dst->flm.elm.ROT_Y);
+    dst->flm.elm.ROT_Z = __builtin_bswap16(dst->flm.elm.ROT_Z);
+    dst->flm.elm.MAG_X = __builtin_bswap16(dst->flm.elm.MAG_X);
+    dst->flm.elm.MAG_Y = __builtin_bswap16(dst->flm.elm.MAG_Y);
+    dst->flm.elm.MAG_Z = __builtin_bswap16(dst->flm.elm.MAG_Z);
 
     //チェックサム生成
     for (i = 1, sum = dst->flm.buf[0]; i <= N_FLAME - 2; i++) {

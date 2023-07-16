@@ -25,12 +25,12 @@ static uint8_t PowerFlag = 0;                           /* Power 状態 Flag */
 
 /* SPI Chip Select */
 static void SELECT(void) {
-    HAL_GPIO_WritePin(CS_SD_GPIO_Port, CS_SD_Pin, GPIO_PIN_RESET);
+    HAL_GPIO_WritePin(SD_CS_GPIO_Port, SD_CS_Pin, GPIO_PIN_RESET);
 }
 
 /* SPI Chip Deselect */
 static void DESELECT(void) {
-    HAL_GPIO_WritePin(CS_SD_GPIO_Port, CS_SD_Pin, GPIO_PIN_SET);
+    HAL_GPIO_WritePin(SD_CS_GPIO_Port, SD_CS_Pin, GPIO_PIN_SET);
 }
 
 /* SPI データ転送 */
