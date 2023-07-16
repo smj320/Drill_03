@@ -173,20 +173,20 @@ void make_HK(DRILL_STATUS *dst, uint8_t *fname) {
     dst->flm.elm.MAG_Z = 31;
 
     //MCP3424 ad0=0,ad1=0
-    if (MCP3424_Read(MCP3424_HV_ADDR, MOT_V_CH, &data)) dst->flm.elm.MOT_V = data >> 6;
-    //if (MCP3424_Read(MCP3424_HV_ADDR, MOT_I_CH, &data)) dst->flm.elm.MOT_I = data >> 6;
-    //if (MCP3424_Read(MCP3424_HV_ADDR, MOT_R_CH, &data)) dst->flm.elm.MOT_R= data >> 6;
-    //if (MCP3424_Read(MCP3424_HV_ADDR, PDU_V_CH, &data)) dst->flm.elm.PDU_V = data >> 6;
+    if (MCP3424_Read(MCP3424_HV_ADDR, MOT_V_CH, &data)==0) dst->flm.elm.MOT_V = data >> 6;
+    if (MCP3424_Read(MCP3424_HV_ADDR, MOT_I_CH, &data)==0) dst->flm.elm.MOT_I = data >> 6;
+    if (MCP3424_Read(MCP3424_HV_ADDR, MOT_R_CH, &data)==0) dst->flm.elm.MOT_R= data >> 6;
+    if (MCP3424_Read(MCP3424_HV_ADDR, PDU_V_CH, &data)==0) dst->flm.elm.PDU_V = data >> 6;
     //MCP3424 ad0=1,ad1=0
-    //if (MCP3424_Read(MCP3424_PT100_ADDR, BAT_T_CH, &data)) dst->flm.elm.BAT_T = data >> 6;
-    //if (MCP3424_Read(MCP3424_PT100_ADDR, LIQ2_T_CH, &data)) dst->flm.elm.LIQ2_T = data;
-    //if (MCP3424_Read(MCP3424_PT100_ADDR, MOT_T_CH, &data)) dst->flm.elm.MOT_T= data >> 6;
-    //if (MCP3424_Read(MCP3424_PT100_ADDR, GEA_T_CH, &data)) dst->flm.elm.GEA_T = data >> 6;
+    if (MCP3424_Read(MCP3424_PT100_ADDR, BAT_T_CH, &data)==0) dst->flm.elm.BAT_T = data >> 6;
+    if (MCP3424_Read(MCP3424_PT100_ADDR, LIQ2_T_CH, &data)==0) dst->flm.elm.LIQ2_T = data;
+    if (MCP3424_Read(MCP3424_PT100_ADDR, MOT_T_CH, &data)==0) dst->flm.elm.MOT_T= data >> 6;
+    if (MCP3424_Read(MCP3424_PT100_ADDR, GEA_T_CH, &data)==0) dst->flm.elm.GEA_T = data >> 6;
     //MCP3424 d0=0,ad1=1
-    //if (MCP3424_Read(MCP3424_LVDT_ADDR, GND_P_CH, &data)) dst->flm.elm.GND_P = data;
-    //if (MCP3424_Read(MCP3424_LVDT_ADDR, BAT_V_CH, &data)) dst->flm.elm.BAT_V = data >> 6;
-    //if (MCP3424_Read(MCP3424_LVDT_ADDR, LIQ1_P_CH, &data)) dst->flm.elm.LIQ1_P= data;
-    //if (MCP3424_Read(MCP3424_LVDT_ADDR, LIQ1_T_CH, &data)) dst->flm.elm.LIQ1_T = data;
+    if (MCP3424_Read(MCP3424_LVDT_ADDR, GND_P_CH, &data)==0) dst->flm.elm.GND_P = data;
+    if (MCP3424_Read(MCP3424_LVDT_ADDR, BAT_V_CH, &data)==0) dst->flm.elm.BAT_V = data >> 6;
+    if (MCP3424_Read(MCP3424_LVDT_ADDR, LIQ1_P_CH, &data)==0) dst->flm.elm.LIQ1_P= data;
+    if (MCP3424_Read(MCP3424_LVDT_ADDR, LIQ1_T_CH, &data)==0) dst->flm.elm.LIQ1_T = data;
 
     //エンコード
     dst->flm.elm.GND_P = __builtin_bswap16(dst->flm.elm.GND_P);

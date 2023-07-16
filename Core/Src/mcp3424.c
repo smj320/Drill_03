@@ -18,7 +18,6 @@ int MCP3424_Read(uint8_t addr, uint8_t ch, uint16_t *data) {
     HAL_Delay(1);
     s = HAL_I2C_Master_Receive(&hi2c1, addr << 1, rcv, 3, 100);
     if (s != HAL_OK) return -2;
-    if ((rcv[2] & 0x80) != 0) return -3;
     *data = rcv[0] << 8 | rcv[1];
     return 0;
 }
