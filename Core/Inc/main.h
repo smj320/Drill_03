@@ -61,7 +61,7 @@ void Error_Handler(void);
 #define MAG_INT_GPIO_Port GPIOA
 #define CPU_MON_Pin GPIO_PIN_3
 #define CPU_MON_GPIO_Port GPIOA
-#define SD_CS_Pin GPIO_PIN_11
+#define SD_CS_Pin GPIO_PIN_4
 #define SD_CS_GPIO_Port GPIOA
 #define SWDIO_Pin GPIO_PIN_13
 #define SWDIO_GPIO_Port GPIOA
