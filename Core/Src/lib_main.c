@@ -35,7 +35,7 @@ _Noreturn void drill_loop(DRILL_STATUS *dst) {
         //1PPSトリガ待機とフラグリセット
         while (dst->F_PPS != 1);
         dst->F_PPS = 0;
-        HAL_GPIO_TogglePin(LED_B_GPIO_Port, LED_B_Pin);
+        HAL_GPIO_TogglePin(CPU_MON_GPIO_Port, CPU_MON_Pin);
 
         //HKデータ編集
         make_HK(dst, fName);
