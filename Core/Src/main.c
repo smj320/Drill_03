@@ -167,7 +167,7 @@ int main(void)
     //bno055_dump();
 
     //MCP3424
-    //MCP3424_dump(MCP3424_HV_ADDR, 0);
+    //MCP3424_dump(MCP3424_HV_ADDR,3);
 
     //FatFs
     Dst.TI = 0;
