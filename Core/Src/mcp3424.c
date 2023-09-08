@@ -2,9 +2,11 @@
 // Created by kikuchi on 2023/06/23.
 //
 #include "main.h"
+#include "drill_mon.h"
 #include "mcp3424.h"
 #include <string.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 extern I2C_HandleTypeDef hi2c1;
 extern UART_HandleTypeDef huart2;
@@ -24,12 +26,23 @@ int MCP3424_Read(uint8_t addr, uint8_t ch, uint16_t *data) {
 
 void MCP3424_dump(uint8_t adr, uint8_t ch) {
     char msg[128];
+    char nBuf[8];
     int rtc;
     uint8_t ti = 0;
     uint16_t data;
     while (1) {
         rtc = MCP3424_Read(adr, ch, &data);
-        sprintf(msg, "%03d CH1 %04X RTC %02d\r\n", ti++, data, rtc);
+        strcpy(msg,"CH:");
+        itoa(ch,nBuf,10);
+        strcat(msg,(char *)nBuf);
+        strcat(msg,"RTC:");
+        itoa(rtc,nBuf,10);
+        strcat(msg,nBuf);
+        strcat(msg,"data:");
+        itoa(data,nBuf,10);
+        strcat(msg,nBuf);
+        strcat(msg,"\r\n");
+        //sprintf(msg, "%03d CH1 %04X RTC %02d\r\n", ti++, data, rtc);
         HAL_UART_Transmit_DMA(&huart2, msg, strlen(msg));
         HAL_Delay(1000);
     }

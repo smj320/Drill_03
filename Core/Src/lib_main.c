@@ -9,6 +9,7 @@
 #include "FatFs.h"
 #include "drill_mon.h"
 #include "mcp3424.h"
+#include <stdio.h>
 
 /**
  * ペリフェラル用ハンドル
@@ -225,4 +226,27 @@ void make_HK(DRILL_STATUS *dst, uint8_t *fname) {
         sum += dst->flm.buf[i];
     };
     dst->flm.buf[N_FLAME - 1] = sum;
+}
+
+void  Lib_dump_3f(int type, float x, float y, float z){
+    char msg[64];
+    char fmt[32];
+    switch(type){
+        case 1:
+            strcpy(fmt,"mag x:%f y:%f z:%f\r\n");
+            break;
+        case 2:
+            strcpy(fmt,"acc x:%f y:%f z:%f\r\n");
+            break;
+        case 3:
+            strcpy(fmt,"grav x:%f y:%f z:%f\r\n");
+            break;
+        case 4:
+            strcpy(fmt,"tmp:%f hum:%f atm:%f\r\n");
+            break;
+        default:
+            strcpy(fmt,"error\r\n");
+    }
+    sprintf(msg, fmt,x,y,z);
+    HAL_UART_Transmit_DMA(&huart2, msg, strlen(msg));
 }

@@ -1,5 +1,6 @@
 #include "bno055.h"
 #include "main.h"
+#include "drill_mon.h"
 #include <string.h>
 
 extern UART_HandleTypeDef huart2;
@@ -36,6 +37,7 @@ void bno055_setOperationModeNDOF() {
   bno055_setOperationMode(BNO055_OPERATION_MODE_NDOF);
 }
 
+#if 0
 void bno055_setExternalCrystalUse(bool state) {
   bno055_setPage(0);
   uint8_t tmp = 0;
@@ -47,18 +49,21 @@ void bno055_setExternalCrystalUse(bool state) {
 
 void bno055_enableExternalCrystal() { bno055_setExternalCrystalUse(true); }
 void bno055_disableExternalCrystal() { bno055_setExternalCrystalUse(false); }
+#endif
 
 void bno055_reset() {
   bno055_writeData(BNO055_SYS_TRIGGER, 0x20);
   bno055_delay(700);
 }
 
+#if 0
 int8_t bno055_getTemp() {
   bno055_setPage(0);
   uint8_t t;
   bno055_readData(BNO055_TEMP, &t, 1);
   return t;
 }
+#endif
 
 void bno055_setup() {
   bno055_reset();
@@ -66,7 +71,7 @@ void bno055_setup() {
   uint8_t id = 0;
   bno055_readData(BNO055_CHIP_ID, &id, 1);
   if (id != BNO055_ID) {
-    printf("Can't find BNO055, id: 0x%02x. Please check your wiring.\r\n", id);
+    //printf("Can't find BNO055, id: 0x%02x. Please check your wiring.\r\n", id);
   }
   bno055_setPage(0);
   bno055_writeData(BNO055_SYS_TRIGGER, 0x0);
@@ -75,13 +80,14 @@ void bno055_setup() {
   bno055_setOperationModeConfig();
   bno055_delay(10);
 }
-
+#if 0
 int16_t bno055_getSWRevision() {
   bno055_setPage(0);
   uint8_t buffer[2];
   bno055_readData(BNO055_SW_REV_ID_LSB, buffer, 2);
   return (int16_t)((buffer[1] << 8) | buffer[0]);
 }
+
 
 uint8_t bno055_getBootloaderRevision() {
   bno055_setPage(0);
@@ -171,6 +177,7 @@ void bno055_setCalibrationData(bno055_calibration_data_t calData) {
 
   bno055_setOperationMode(operationMode);
 }
+#endif
 
 bno055_vector_t bno055_getVector(uint8_t vec) {
   bno055_setPage(0);
@@ -211,6 +218,7 @@ bno055_vector_t bno055_getVector(uint8_t vec) {
   return xyz;
 }
 
+#if 0
 bno055_vector_t bno055_getVectorAccelerometer() {
   return bno055_getVector(BNO055_VECTOR_ACCELEROMETER);
 }
@@ -223,9 +231,13 @@ bno055_vector_t bno055_getVectorGyroscope() {
 bno055_vector_t bno055_getVectorEuler() {
   return bno055_getVector(BNO055_VECTOR_EULER);
 }
+#endif
+
 bno055_vector_t bno055_getVectorLinearAccel() {
   return bno055_getVector(BNO055_VECTOR_LINEARACCEL);
 }
+
+#if 0
 bno055_vector_t bno055_getVectorGravity() {
   return bno055_getVector(BNO055_VECTOR_GRAVITY);
 }
@@ -239,19 +251,17 @@ void bno055_setAxisMap(bno055_axis_map_t axis) {
   bno055_writeData(BNO055_AXIS_MAP_CONFIG, axisRemap);
   bno055_writeData(BNO055_AXIS_MAP_SIGN, axisMapSign);
 }
+#endif
 
 void bno055_dump()
 {
     while (1)
     {
-        char msg[128];
-        bno055_vector_t v = bno055_getVectorEuler();
-        sprintf(msg, "Heading: %.2f Roll: %.2f Pitch: %.2f ", v.x, v.y, v.z);
-        HAL_UART_Transmit_DMA(&huart2, msg, strlen(msg));
-        HAL_Delay(500);
-        v = bno055_getVectorQuaternion();
-        sprintf(msg, "W: %.2f X: %.2f Y: %.2f Z: %.2f\r\n", v.w, v.x, v.y, v.z);
-        HAL_UART_Transmit_DMA(&huart2, msg, strlen(msg));
-        HAL_Delay(500);
+        bno055_vector_t v = bno055_getVectorLinearAccel();
+        Lib_dump_3f(2,(float)v.x,(float)v.y,(float)v.z);
+        HAL_Delay(1000);
+        //v = bno055_getVectorQuaternion();
+        //sprintf(msg, "W: %.2f X: %.2f Y: %.2f Z: %.2f\r\n", v.w, v.x, v.y, v.z);
+        //HAL_Delay(500);
     }
 }

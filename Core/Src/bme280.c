@@ -49,9 +49,7 @@
     @brief Sensor driver for BME280 sensor */
 #include "bme280.h"
 #include "main.h"
-#include <stdio.h>
-#include <string.h>
-
+#include "drill_mon.h"
 
 extern UART_HandleTypeDef huart2;
 
@@ -1286,7 +1284,6 @@ void bme280_dump(struct bme280_dev *dev, struct bme280_data *comp_data)
         float temp;
         float hum;
         float pre;
-        char msg[128];
         int8_t result;
 
         result = bme280_set_sensor_mode(BME280_FORCED_MODE, dev);
@@ -1295,9 +1292,7 @@ void bme280_dump(struct bme280_dev *dev, struct bme280_data *comp_data)
         temp = comp_data->temperature / 100.0;      /* C  */
         hum = comp_data->humidity / 1024.0;           /* %   */
         pre = comp_data->pressure / 10000.0;          /* hPa */
-
-        sprintf(msg, "tmp %8.2f[C] atm %8.2f[hPa] hum %8.2f[%%]\r\n", temp, pre, hum);
-        HAL_UART_Transmit_DMA(&huart2, msg, strlen(msg));
+        Lib_dump_3f(4,temp,hum,pre);
         HAL_Delay(1000);
     }
 }

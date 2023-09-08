@@ -74,6 +74,9 @@ typedef struct {
 void FS_Init(DRILL_STATUS *dst);
 void PPS_Tick(DRILL_STATUS *dst);
 
+//lib_mainにあるダンプ関数
+void Lib_dump_3f(int type, float x, float y, float z);
+
 /**
  * mainで読み込むタスクの実体
  * @param argument

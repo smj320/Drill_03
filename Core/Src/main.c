@@ -151,7 +151,7 @@ int main(void)
     dev.read = BME280_i2c_read;
     dev.write = BME280_i2c_write;
     dev.delay_ms = BME280_delay_ms;
-    //result = bme280_init(&dev);
+    result = bme280_init(&dev);
     dev.settings.osr_h = BME280_OVERSAMPLING_1X;
     dev.settings.osr_p = BME280_OVERSAMPLING_16X;
     dev.settings.osr_t = BME280_OVERSAMPLING_2X;
@@ -161,10 +161,10 @@ int main(void)
     //bme280_dump(&dev, &comp_data);
 
     //acc
-    //bno055_assignI2C(&hi2c1);
-    //bno055_setup();
-    //bno055_setOperationModeNDOF();
-    //bno055_dump();
+    bno055_assignI2C(&hi2c1);
+    bno055_setup();
+    bno055_setOperationModeNDOF();
+    bno055_dump();
 
     //MCP3424
     //MCP3424_dump(MCP3424_HV_ADDR,3);

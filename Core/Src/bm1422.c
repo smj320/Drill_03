@@ -1,9 +1,9 @@
 #include "main.h"
-#include <stdio.h>
-#include <string.h>
+#include "drill_mon.h"
 
 extern I2C_HandleTypeDef hi2c1;
 extern UART_HandleTypeDef huart2;
+
 uint8_t BM1422_addr = 0x0e << 1;
 
 void BM1422_write_data(uint8_t addr, uint8_t reg, uint8_t data) {
@@ -45,10 +45,8 @@ void BM1422_dump()
 {
     while (1) {
         int16_t mag_xyz[3];
-        char msg[128];
         BM1422_read_mag(mag_xyz);
-        sprintf(msg, "X=%d Y=%d Z=%d\r\n", mag_xyz[0], mag_xyz[1], mag_xyz[2]);
-        HAL_UART_Transmit_DMA(&huart2, msg, strlen(msg));
+        Lib_dump_3f(1,mag_xyz[0],mag_xyz[1],mag_xyz[2]);
         HAL_Delay(1000);
     }
 }
