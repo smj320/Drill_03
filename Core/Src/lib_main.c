@@ -6,7 +6,6 @@
 #include "main.h"
 #include "string.h"
 #include "time.h"
-#include "FatFs.h"
 #include "drill_mon.h"
 #include "mcp3424.h"
 #include <stdio.h>
@@ -27,7 +26,6 @@ void make_HK(DRILL_STATUS *dst, uint8_t *fName);
  */
 _Noreturn void drill_loop(DRILL_STATUS *dst) {
     //ファイル操作用
-    FIL fil;
     uint8_t fName[16];
     uint8_t cc;
 
@@ -45,6 +43,7 @@ _Noreturn void drill_loop(DRILL_STATUS *dst) {
         HAL_UART_Transmit_DMA(&huart2, dst->flm.buf, N_FLAME);
 
         //初回動作または時刻の切れ目でファイルオープン
+#if 0
         if ((dst->TI % FILE_RENEW_SEC) == 0 || dst->isFirst == 1) {
             //初回でなければクローズ
             if (dst->isFirst != 1) f_close(&fil);
@@ -57,24 +56,10 @@ _Noreturn void drill_loop(DRILL_STATUS *dst) {
         UINT bw;
         f_write(&fil, dst->flm.buf, N_FLAME, &bw);
         f_sync(&fil);
-
+#endif
         //初回フラグクリア
         dst->isFirst = 0;
     }
-}
-
-//*********************************************
-//ファイルシステム初期化関数
-//*********************************************
-/**
- * ファイルシステムマウント
- * @param dst
- */
-void FS_Init(DRILL_STATUS *dst) {
-    static FATFS Fs;
-    static FRESULT rtc;
-    rtc = f_mount(&Fs, "/", 1);
-    dst->fMount = (rtc == FR_OK) ? 1 : 0;
 }
 
 //*********************************************
@@ -173,33 +158,33 @@ void make_HK(DRILL_STATUS *dst, uint8_t *fname) {
     dst->flm.elm.MAG_Z = 31;
 
     //MCP3424 ad0=0,ad1=0
-    if (MCP3424_Read(MCP3424_HV_ADDR, MOT_V_CH, &data)==0) dst->flm.elm.MOT_V = data >> 6;
+    if (MCP3424_Read(MCP3424_HV_ADDR, MOT_V_CH, &data) == 0) dst->flm.elm.MOT_V = data >> 6;
     HAL_Delay(20);
-    if (MCP3424_Read(MCP3424_HV_ADDR, MOT_I_CH, &data)==0) dst->flm.elm.MOT_I = data >> 6;
+    if (MCP3424_Read(MCP3424_HV_ADDR, MOT_I_CH, &data) == 0) dst->flm.elm.MOT_I = data >> 6;
     HAL_Delay(20);
-    if (MCP3424_Read(MCP3424_HV_ADDR, MOT_R_CH, &data)==0) dst->flm.elm.MOT_R= data >> 6;
+    if (MCP3424_Read(MCP3424_HV_ADDR, MOT_R_CH, &data) == 0) dst->flm.elm.MOT_R = data >> 6;
     HAL_Delay(20);
-    if (MCP3424_Read(MCP3424_HV_ADDR, PDU_V_CH, &data)==0) dst->flm.elm.PDU_V = data >> 6;
+    if (MCP3424_Read(MCP3424_HV_ADDR, PDU_V_CH, &data) == 0) dst->flm.elm.PDU_V = data >> 6;
     HAL_Delay(20);
 
     //MCP3424 ad0=1,ad1=0
-    if (MCP3424_Read(MCP3424_PT100_ADDR, BAT_T_CH, &data)==0) dst->flm.elm.BAT_T = data >> 6;
+    if (MCP3424_Read(MCP3424_PT100_ADDR, BAT_T_CH, &data) == 0) dst->flm.elm.BAT_T = data >> 6;
     HAL_Delay(20);
-    if (MCP3424_Read(MCP3424_PT100_ADDR, LIQ2_T_CH, &data)==0) dst->flm.elm.LIQ2_T = data;
+    if (MCP3424_Read(MCP3424_PT100_ADDR, LIQ2_T_CH, &data) == 0) dst->flm.elm.LIQ2_T = data;
     HAL_Delay(20);
-    if (MCP3424_Read(MCP3424_PT100_ADDR, MOT_T_CH, &data)==0) dst->flm.elm.MOT_T= data >> 6;
+    if (MCP3424_Read(MCP3424_PT100_ADDR, MOT_T_CH, &data) == 0) dst->flm.elm.MOT_T = data >> 6;
     HAL_Delay(20);
-    if (MCP3424_Read(MCP3424_PT100_ADDR, GEA_T_CH, &data)==0) dst->flm.elm.GEA_T = data >> 6;
+    if (MCP3424_Read(MCP3424_PT100_ADDR, GEA_T_CH, &data) == 0) dst->flm.elm.GEA_T = data >> 6;
     HAL_Delay(20);
 
     //MCP3424 d0=0,ad1=1
-    if (MCP3424_Read(MCP3424_LVDT_ADDR, GND_P_CH, &data)==0) dst->flm.elm.GND_P = data;
+    if (MCP3424_Read(MCP3424_LVDT_ADDR, GND_P_CH, &data) == 0) dst->flm.elm.GND_P = data;
     HAL_Delay(20);
-    if (MCP3424_Read(MCP3424_LVDT_ADDR, BAT_V_CH, &data)==0) dst->flm.elm.BAT_V = data >> 6;
+    if (MCP3424_Read(MCP3424_LVDT_ADDR, BAT_V_CH, &data) == 0) dst->flm.elm.BAT_V = data >> 6;
     HAL_Delay(20);
-    if (MCP3424_Read(MCP3424_LVDT_ADDR, LIQ1_P_CH, &data)==0) dst->flm.elm.LIQ1_P= data;
+    if (MCP3424_Read(MCP3424_LVDT_ADDR, LIQ1_P_CH, &data) == 0) dst->flm.elm.LIQ1_P = data;
     HAL_Delay(20);
-    if (MCP3424_Read(MCP3424_LVDT_ADDR, LIQ1_T_CH, &data)==0) dst->flm.elm.LIQ1_T = data;
+    if (MCP3424_Read(MCP3424_LVDT_ADDR, LIQ1_T_CH, &data) == 0) dst->flm.elm.LIQ1_T = data;
     HAL_Delay(20);
 
     //エンコード
@@ -228,25 +213,31 @@ void make_HK(DRILL_STATUS *dst, uint8_t *fname) {
     dst->flm.buf[N_FLAME - 1] = sum;
 }
 
-void  Lib_dump_3f(int type, float x, float y, float z){
+void Lib_dump_3f(int type, float x, float y, float z) {
     char msg[64];
     char fmt[32];
-    switch(type){
-        case 1:
-            strcpy(fmt,"mag x:%f y:%f z:%f\r\n");
+    switch (type) {
+        case DTP_MAG:
+            strcpy(fmt, "mag x:%f y:%f z:%f\r\n");
             break;
-        case 2:
-            strcpy(fmt,"acc x:%f y:%f z:%f\r\n");
+        case DTP_GRA:
+            strcpy(fmt, "grav x:%f y:%f z:%f\r\n");
             break;
-        case 3:
-            strcpy(fmt,"grav x:%f y:%f z:%f\r\n");
+        case DTP_GAY:
+            strcpy(fmt, "gyro x:%f y:%f z:%f\r\n");
             break;
-        case 4:
-            strcpy(fmt,"tmp:%f hum:%f atm:%f\r\n");
+        case DTP_HUM:
+            strcpy(fmt, "tmp  t:%f hum:%f atm:%f\r\n");
             break;
         default:
-            strcpy(fmt,"error\r\n");
+            strcpy(fmt, "error\r\n");
     }
-    sprintf(msg, fmt,x,y,z);
+    sprintf(msg, fmt, x, y, z);
+    HAL_UART_Transmit_DMA(&huart2, msg, strlen(msg));
+}
+
+void Lib_dump_ad(int8_t ch, int8_t rtc, uint16_t dt) {
+    char msg[64];
+    sprintf(msg, "ad ch:%d rtc:%d, data:%04x\r\n", ch, rtc, dt);
     HAL_UART_Transmit_DMA(&huart2, msg, strlen(msg));
 }

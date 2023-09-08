@@ -18,7 +18,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "fatfs.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -136,13 +135,12 @@ int main(void)
   MX_GPIO_Init();
   MX_DMA_Init();
   MX_USART2_UART_Init();
-  MX_FATFS_Init();
   MX_TIM6_Init();
   MX_I2C1_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
     //Geo_mag
-    //BM1422_Init();
+    BM1422_Init();
     //BM1422_dump();
 
     //BME280
@@ -156,25 +154,18 @@ int main(void)
     dev.settings.osr_p = BME280_OVERSAMPLING_16X;
     dev.settings.osr_t = BME280_OVERSAMPLING_2X;
     dev.settings.filter = BME280_FILTER_COEFF_16;
-    //result = bme280_set_sensor_settings(
-    //        BME280_OSR_PRESS_SEL | BME280_OSR_TEMP_SEL | BME280_OSR_HUM_SEL | BME280_FILTER_SEL, &dev);
+    result = bme280_set_sensor_settings(
+            BME280_OSR_PRESS_SEL | BME280_OSR_TEMP_SEL | BME280_OSR_HUM_SEL | BME280_FILTER_SEL, &dev);
     //bme280_dump(&dev, &comp_data);
 
     //acc
     bno055_assignI2C(&hi2c1);
     bno055_setup();
     bno055_setOperationModeNDOF();
-    bno055_dump();
+    //bno055_dump();
 
     //MCP3424
-    //MCP3424_dump(MCP3424_HV_ADDR,3);
-
-    //FatFs
-    Dst.TI = 0;
-    Dst.F_PPS = 0;
-    Dst.fMount = 0;
-    Dst.fOpen = 0;
-    FS_Init(&Dst);
+    MCP3424_dump(MCP3424_HV_ADDR,3);
 
     //タイマスタート
     HAL_TIM_Base_Start_IT(&htim6);

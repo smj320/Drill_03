@@ -1292,7 +1292,7 @@ void bme280_dump(struct bme280_dev *dev, struct bme280_data *comp_data)
         temp = comp_data->temperature / 100.0;      /* C  */
         hum = comp_data->humidity / 1024.0;           /* %   */
         pre = comp_data->pressure / 10000.0;          /* hPa */
-        Lib_dump_3f(4,temp,hum,pre);
+        Lib_dump_3f(DTP_HUM,temp,hum,pre);
         HAL_Delay(1000);
     }
 }

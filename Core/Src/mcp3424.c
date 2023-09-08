@@ -24,26 +24,12 @@ int MCP3424_Read(uint8_t addr, uint8_t ch, uint16_t *data) {
     return 0;
 }
 
-void MCP3424_dump(uint8_t adr, uint8_t ch) {
-    char msg[128];
-    char nBuf[8];
+void MCP3424_dump(uint8_t adr, int8_t ch) {
     int rtc;
-    uint8_t ti = 0;
     uint16_t data;
     while (1) {
         rtc = MCP3424_Read(adr, ch, &data);
-        strcpy(msg,"CH:");
-        itoa(ch,nBuf,10);
-        strcat(msg,(char *)nBuf);
-        strcat(msg,"RTC:");
-        itoa(rtc,nBuf,10);
-        strcat(msg,nBuf);
-        strcat(msg,"data:");
-        itoa(data,nBuf,10);
-        strcat(msg,nBuf);
-        strcat(msg,"\r\n");
-        //sprintf(msg, "%03d CH1 %04X RTC %02d\r\n", ti++, data, rtc);
-        HAL_UART_Transmit_DMA(&huart2, msg, strlen(msg));
+        Lib_dump_ad(ch, rtc, data);
         HAL_Delay(1000);
     }
 }

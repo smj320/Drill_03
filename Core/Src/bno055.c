@@ -37,7 +37,6 @@ void bno055_setOperationModeNDOF() {
   bno055_setOperationMode(BNO055_OPERATION_MODE_NDOF);
 }
 
-#if 0
 void bno055_setExternalCrystalUse(bool state) {
   bno055_setPage(0);
   uint8_t tmp = 0;
@@ -49,21 +48,18 @@ void bno055_setExternalCrystalUse(bool state) {
 
 void bno055_enableExternalCrystal() { bno055_setExternalCrystalUse(true); }
 void bno055_disableExternalCrystal() { bno055_setExternalCrystalUse(false); }
-#endif
 
 void bno055_reset() {
   bno055_writeData(BNO055_SYS_TRIGGER, 0x20);
   bno055_delay(700);
 }
 
-#if 0
 int8_t bno055_getTemp() {
   bno055_setPage(0);
   uint8_t t;
   bno055_readData(BNO055_TEMP, &t, 1);
   return t;
 }
-#endif
 
 void bno055_setup() {
   bno055_reset();
@@ -80,7 +76,7 @@ void bno055_setup() {
   bno055_setOperationModeConfig();
   bno055_delay(10);
 }
-#if 0
+
 int16_t bno055_getSWRevision() {
   bno055_setPage(0);
   uint8_t buffer[2];
@@ -177,7 +173,6 @@ void bno055_setCalibrationData(bno055_calibration_data_t calData) {
 
   bno055_setOperationMode(operationMode);
 }
-#endif
 
 bno055_vector_t bno055_getVector(uint8_t vec) {
   bno055_setPage(0);
@@ -218,7 +213,6 @@ bno055_vector_t bno055_getVector(uint8_t vec) {
   return xyz;
 }
 
-#if 0
 bno055_vector_t bno055_getVectorAccelerometer() {
   return bno055_getVector(BNO055_VECTOR_ACCELEROMETER);
 }
@@ -231,13 +225,11 @@ bno055_vector_t bno055_getVectorGyroscope() {
 bno055_vector_t bno055_getVectorEuler() {
   return bno055_getVector(BNO055_VECTOR_EULER);
 }
-#endif
 
 bno055_vector_t bno055_getVectorLinearAccel() {
   return bno055_getVector(BNO055_VECTOR_LINEARACCEL);
 }
 
-#if 0
 bno055_vector_t bno055_getVectorGravity() {
   return bno055_getVector(BNO055_VECTOR_GRAVITY);
 }
@@ -251,17 +243,18 @@ void bno055_setAxisMap(bno055_axis_map_t axis) {
   bno055_writeData(BNO055_AXIS_MAP_CONFIG, axisRemap);
   bno055_writeData(BNO055_AXIS_MAP_SIGN, axisMapSign);
 }
-#endif
 
 void bno055_dump()
 {
+    bno055_vector_t v;
     while (1)
     {
-        bno055_vector_t v = bno055_getVectorLinearAccel();
-        Lib_dump_3f(2,(float)v.x,(float)v.y,(float)v.z);
+        v = bno055_getVectorGravity();
+        Lib_dump_3f(DTP_GRA,(float)v.x,(float)v.y,(float)v.z);
         HAL_Delay(1000);
-        //v = bno055_getVectorQuaternion();
-        //sprintf(msg, "W: %.2f X: %.2f Y: %.2f Z: %.2f\r\n", v.w, v.x, v.y, v.z);
-        //HAL_Delay(500);
+
+        //v = bno055_getVectorGyroscope();
+        //Lib_dump_3f(DTP_GAY,(float)v.x,(float)v.y,(float)v.z);
+        //HAL_Delay(1000);
     }
 }

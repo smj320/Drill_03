@@ -16,12 +16,12 @@
  * 送り出す前にビッグエンディアンに直す必要がある。
 */
 #define N_FLAME 80     //転送バッファ長
-union tlm_flame{
+union tlm_flame {
     uint8_t buf[N_FLAME];
-    struct  {
+    struct {
         uint32_t FS;
         uint32_t TI;
-        uint8_t  STAT;
+        uint8_t STAT;
         uint8_t PDU_V;
         uint8_t DMY1;
         uint8_t BAT_V;
@@ -72,10 +72,20 @@ typedef struct {
  * mainで使う割込関数の実体
  */
 void FS_Init(DRILL_STATUS *dst);
+
 void PPS_Tick(DRILL_STATUS *dst);
 
 //lib_mainにあるダンプ関数
+enum {
+    DTP_MAG,
+    DTP_GAY,
+    DTP_GRA,
+    DTP_HUM,
+};
+
 void Lib_dump_3f(int type, float x, float y, float z);
+
+void Lib_dump_ad(int8_t ch, int8_t rtc, uint16_t dt);
 
 /**
  * mainで読み込むタスクの実体

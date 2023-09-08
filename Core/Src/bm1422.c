@@ -41,12 +41,12 @@ void BM1422_read_mag(int16_t mag[]) {
     mag[2] = BM1422_read_word_data(BM1422_addr, 0x14);
 }
 
-void BM1422_dump()
-{
+void BM1422_dump() {
+    //LSB = 0.042uT
     while (1) {
         int16_t mag_xyz[3];
         BM1422_read_mag(mag_xyz);
-        Lib_dump_3f(1,mag_xyz[0],mag_xyz[1],mag_xyz[2]);
+        Lib_dump_3f(DTP_MAG, mag_xyz[0] * 0.042, mag_xyz[1] * 0.042, mag_xyz[2] * 0.042);
         HAL_Delay(1000);
     }
 }
