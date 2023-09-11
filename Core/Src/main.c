@@ -165,7 +165,7 @@ int main(void)
     //bno055_dump();
 
     //MCP3424
-    MCP3424_dump(MCP3424_HV_ADDR,3);
+    MCP3424_dump(MCP3424_HV_ADDR);
 
     //タイマスタート
     HAL_TIM_Base_Start_IT(&htim6);

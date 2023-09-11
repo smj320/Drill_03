@@ -14,7 +14,7 @@ extern UART_HandleTypeDef huart2;
 int MCP3424_Read(uint8_t addr, uint8_t ch, uint16_t *data) {
     HAL_StatusTypeDef s;
     uint8_t rcv[3];
-    uint8_t cmd[4] = {0x84, 0xA4, 0xC4, 0xE4};
+    uint8_t cmd[4] = {0x98, 0xB8, 0xD8, 0xF8};
     s = HAL_I2C_Master_Transmit(&hi2c1, addr << 1, &cmd[ch], 1, 100);
     if (s != HAL_OK) return -1;
     HAL_Delay(1);
@@ -24,11 +24,15 @@ int MCP3424_Read(uint8_t addr, uint8_t ch, uint16_t *data) {
     return 0;
 }
 
-void MCP3424_dump(uint8_t adr, int8_t ch) {
-    int rtc;
-    uint16_t data;
+void MCP3424_dump(uint8_t adr) {
+    int rtc[4];
+    uint16_t data[4];
+    int ch;
     while (1) {
-        rtc = MCP3424_Read(adr, ch, &data);
+        for(ch=0;ch<4;ch++){
+            rtc[ch] = MCP3424_Read(adr, ch, &data[ch]);
+            HAL_Delay(100);
+        }
         Lib_dump_ad(ch, rtc, data);
         HAL_Delay(1000);
     }

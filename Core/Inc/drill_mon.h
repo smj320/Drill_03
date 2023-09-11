@@ -85,7 +85,7 @@ enum {
 
 void Lib_dump_3f(int type, float x, float y, float z);
 
-void Lib_dump_ad(int8_t ch, int8_t rtc, uint16_t dt);
+void Lib_dump_ad(int8_t ch, int8_t rtc[], uint16_t data[]);
 
 /**
  * mainで読み込むタスクの実体

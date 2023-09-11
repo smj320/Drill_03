@@ -236,8 +236,9 @@ void Lib_dump_3f(int type, float x, float y, float z) {
     HAL_UART_Transmit_DMA(&huart2, msg, strlen(msg));
 }
 
-void Lib_dump_ad(int8_t ch, int8_t rtc, uint16_t dt) {
+void Lib_dump_ad(int8_t ch, int8_t rtc[], uint16_t data[]) {
     char msg[64];
-    sprintf(msg, "ad ch:%d rtc:%d, data:%04x\r\n", ch, rtc, dt);
+    sprintf(msg, "ad %d:%04X %d:%04X %d:%04X %d:%04X\r\n",
+            rtc[0], data[0], rtc[1], data[1], rtc[2], data[2], rtc[3], data[3]);
     HAL_UART_Transmit_DMA(&huart2, msg, strlen(msg));
 }
