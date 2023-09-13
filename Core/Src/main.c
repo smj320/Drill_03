@@ -162,7 +162,12 @@ int main(void)
     bno055_assignI2C(&hi2c1);
     bno055_setup();
     bno055_setOperationModeNDOF();
-    //bno055_dump();
+    //bno055_dump(&hi2c1);
+    while(1){
+        uint8_t data;
+        HAL_I2C_Mem_Read(&hi2c1,BNO055_I2C_ADDR,0x50,1,&data,1,100);
+        HAL_Delay(1000);
+    }
 
     //MCP3424
     //MCP3424_dump(MCP3424_HV_ADDR);
@@ -243,7 +248,7 @@ static void MX_I2C1_Init(void)
 
   /* USER CODE END I2C1_Init 1 */
   hi2c1.Instance = I2C1;
-  hi2c1.Init.Timing = 0x00101D7C;
+  hi2c1.Init.Timing = 0x2000090E;
   hi2c1.Init.OwnAddress1 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;

@@ -247,6 +247,8 @@ void bno055_setAxisMap(bno055_axis_map_t axis) {
 void bno055_dump()
 {
     bno055_vector_t v;
+    uint8_t data;
+
     while (1)
     {
 #if 1

@@ -270,8 +270,8 @@ enum bno055_axis_map_sign_t {
   BNO055_AXIS_SIGN_NEGATIVE = 0x01
 };
 
-void bno055_writeData(uint8_t reg, uint8_t data);
-void bno055_readData(uint8_t reg, uint8_t *data, uint8_t len);
+int bno055_writeData(uint8_t reg, uint8_t data);
+int bno055_readData(uint8_t reg, uint8_t *data, uint8_t len);
 void bno055_delay(int time);
 
 void bno055_reset();

@@ -170,7 +170,7 @@ void make_HK(DRILL_STATUS *dst, uint8_t *fname) {
     dst->flm.elm.MAG_Y = 30;
     dst->flm.elm.MAG_Z = 31;
 
-#if 1
+#if 0
     //気温・湿度・圧力
     bme280_set_sensor_mode(BME280_FORCED_MODE, &bme_dev);
     HAL_Delay(40);
@@ -182,23 +182,26 @@ void make_HK(DRILL_STATUS *dst, uint8_t *fname) {
     }
 #endif
 
-#if 0
+#if 1
     //加速度
     v = bno055_getVectorGravity();  //Unit m/s^2
     dst->flm.elm.GRA_X = v.x*100;
     dst->flm.elm.GRA_Y = v.y*100;
     dst->flm.elm.GRA_Z = v.z*100;
+    HAL_Delay(10);
     v = bno055_getVectorGyroscope(); //Unit deg/sec
     dst->flm.elm.ROT_X = v.x*100;
     dst->flm.elm.ROT_Y = v.y*100;
     dst->flm.elm.ROT_Z = v.z*100;
+    HAL_Delay(10);
     v = bno055_getVectorLinearAccel(); //Unit m/s^2
     dst->flm.elm.ACC_X = v.x*100;
     dst->flm.elm.ACC_Y = v.y*100;
     dst->flm.elm.ACC_Z = v.z*100;
+    HAL_Delay(10);
 #endif
 
-#if 1
+#if 0
     //磁場 *0.042で uT
     BM1422_read_mag(mag_xyz);
     dst->flm.elm.MAG_X = mag_xyz[0];
@@ -209,7 +212,7 @@ void make_HK(DRILL_STATUS *dst, uint8_t *fname) {
     //HAL_GPIO_WritePin(CPU_MON_GPIO_Port, CPU_MON_Pin, GPIO_PIN_RESET);
 #endif
 
-#if 1
+#if 0
     //MCP3424 MCP3424_HV_ADDR, ad0=0,ad1=0
     //MCP3424 MCP3424_PT100_ADDR, ad0=1,ad1=0
     //MCP3424 MCP3424_PT100_ADDR, d0=0,ad1=1
