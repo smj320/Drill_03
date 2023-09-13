@@ -59,7 +59,7 @@ DMA_HandleTypeDef hdma_usart2_tx;
 /* USER CODE BEGIN PV */
 DRILL_STATUS Dst;
 //bme280
-struct bme280_dev dev;
+struct bme280_dev bme_dev;
 struct bme280_data comp_data;
 int8_t result;
 /* USER CODE END PV */
@@ -144,19 +144,19 @@ int main(void)
     //BM1422_dump();
 
     //BME280
-    dev.dev_id = BME280_I2C_ADDR_PRIM;
-    dev.intf = BME280_I2C_INTF;
-    dev.read = BME280_i2c_read;
-    dev.write = BME280_i2c_write;
-    dev.delay_ms = BME280_delay_ms;
-    result = bme280_init(&dev);
-    dev.settings.osr_h = BME280_OVERSAMPLING_1X;
-    dev.settings.osr_p = BME280_OVERSAMPLING_16X;
-    dev.settings.osr_t = BME280_OVERSAMPLING_2X;
-    dev.settings.filter = BME280_FILTER_COEFF_16;
+    bme_dev.dev_id = BME280_I2C_ADDR_PRIM;
+    bme_dev.intf = BME280_I2C_INTF;
+    bme_dev.read = BME280_i2c_read;
+    bme_dev.write = BME280_i2c_write;
+    bme_dev.delay_ms = BME280_delay_ms;
+    result = bme280_init(&bme_dev);
+    bme_dev.settings.osr_h = BME280_OVERSAMPLING_1X;
+    bme_dev.settings.osr_p = BME280_OVERSAMPLING_16X;
+    bme_dev.settings.osr_t = BME280_OVERSAMPLING_2X;
+    bme_dev.settings.filter = BME280_FILTER_COEFF_16;
     result = bme280_set_sensor_settings(
-            BME280_OSR_PRESS_SEL | BME280_OSR_TEMP_SEL | BME280_OSR_HUM_SEL | BME280_FILTER_SEL, &dev);
-    //bme280_dump(&dev, &comp_data);
+            BME280_OSR_PRESS_SEL | BME280_OSR_TEMP_SEL | BME280_OSR_HUM_SEL | BME280_FILTER_SEL, &bme_dev);
+    //bme280_dump(&bme_dev, &comp_data);
 
     //acc
     bno055_assignI2C(&hi2c1);
@@ -165,7 +165,9 @@ int main(void)
     //bno055_dump();
 
     //MCP3424
-    MCP3424_dump(MCP3424_HV_ADDR);
+    //MCP3424_dump(MCP3424_HV_ADDR);
+    //MCP3424_dump(MCP3424_PT100_ADDR);
+    //MCP3424_dump(MCP3424_LVDT_ADDR);
 
     //タイマスタート
     HAL_TIM_Base_Start_IT(&htim6);
@@ -241,7 +243,7 @@ static void MX_I2C1_Init(void)
 
   /* USER CODE END I2C1_Init 1 */
   hi2c1.Instance = I2C1;
-  hi2c1.Init.Timing = 0x00108EFB;
+  hi2c1.Init.Timing = 0x00101D7C;
   hi2c1.Init.OwnAddress1 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;

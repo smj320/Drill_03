@@ -22,35 +22,35 @@ union tlm_flame {
         uint32_t FS;
         uint32_t TI;
         uint8_t STAT;
-        uint8_t PDU_V;
-        uint8_t DMY1;
-        uint8_t BAT_V;
-        uint8_t BAT_T;
-        uint8_t SYS_T;
-        uint8_t SYS_H;
-        uint8_t SYS_P;
-        uint16_t GND_P;
-        uint8_t MOT_V;
-        uint8_t MOT_I;
-        uint8_t MOT_T;
-        uint8_t GEA_T;
-        uint8_t MOT_R;
-        uint16_t LIQ1_T;
-        uint16_t LIQ1_P;
-        uint16_t LIQ2_T;
-        uint16_t BOA_D;
-        uint16_t GRA_X;
-        uint16_t GRA_Y;
-        uint16_t GRA_Z;
-        uint16_t ACC_X;
-        uint16_t ACC_Y;
-        uint16_t ACC_Z;
-        uint16_t ROT_X;
-        uint16_t ROT_Y;
-        uint16_t ROT_Z;
-        uint16_t MAG_X;
-        uint16_t MAG_Y;
-        uint16_t MAG_Z;
+        int8_t PDU_V;
+        int8_t DMY1;
+        int8_t BAT_V;
+        int8_t BAT_T;
+        int8_t SYS_T;
+        int8_t SYS_H;
+        int8_t SYS_P;
+        int16_t GND_P;
+        int8_t MOT_V;
+        int8_t MOT_I;
+        int8_t MOT_T;
+        int8_t GEA_T;
+        int8_t MOT_R;
+        int16_t LIQ1_T;
+        int16_t LIQ1_P;
+        int16_t LIQ2_T;
+        int16_t BOA_D;
+        int16_t GRA_X;
+        int16_t GRA_Y;
+        int16_t GRA_Z;
+        int16_t ACC_X;
+        int16_t ACC_Y;
+        int16_t ACC_Z;
+        int16_t ROT_X;
+        int16_t ROT_Y;
+        int16_t ROT_Z;
+        int16_t MAG_X;
+        int16_t MAG_Y;
+        int16_t MAG_Z;
         uint16_t PAD;
         uint16_t SUM;
     } elm;
@@ -80,12 +80,13 @@ enum {
     DTP_MAG,
     DTP_GAY,
     DTP_GRA,
+    DTP_ACC,
     DTP_HUM,
 };
 
 void Lib_dump_3f(int type, float x, float y, float z);
 
-void Lib_dump_ad(int8_t ch, int8_t rtc[], uint16_t data[]);
+void Lib_dump_ad(int8_t rtc[], uint16_t data[]);
 
 /**
  * mainで読み込むタスクの実体

@@ -7,14 +7,20 @@
 #include "string.h"
 #include "time.h"
 #include "drill_mon.h"
+#include "bme280.h"
 #include "mcp3424.h"
+#include "bno055.h"
+#include "bm1422.h"
 #include <stdio.h>
+#include <math.h>
 
 /**
  * ペリフェラル用ハンドル
  */
 extern I2C_HandleTypeDef hi2c1;
 extern UART_HandleTypeDef huart2;
+extern struct bme280_dev bme_dev;
+extern struct bme280_data comp_data;
 
 /**
  * 後ろにあるやつ
@@ -27,6 +33,7 @@ void make_HK(DRILL_STATUS *dst, uint8_t *fName);
 _Noreturn void drill_loop(DRILL_STATUS *dst) {
     //ファイル操作用
     uint8_t fName[16];
+    uint8_t txBuf[N_FLAME];
     uint8_t cc;
 
     //メインループ
@@ -34,13 +41,14 @@ _Noreturn void drill_loop(DRILL_STATUS *dst) {
         //1PPSトリガ待機とフラグリセット
         while (dst->F_PPS != 1);
         dst->F_PPS = 0;
-        HAL_GPIO_TogglePin(CPU_MON_GPIO_Port, CPU_MON_Pin);
+        //HAL_GPIO_TogglePin(CPU_MON_GPIO_Port, CPU_MON_Pin);
 
         //HKデータ編集
         make_HK(dst, fName);
 
         //UARTにデータ転送
-        HAL_UART_Transmit_DMA(&huart2, dst->flm.buf, N_FLAME);
+        memcpy(txBuf,dst->flm.buf,N_FLAME);
+        HAL_UART_Transmit_DMA(&huart2, txBuf, N_FLAME);
 
         //初回動作または時刻の切れ目でファイルオープン
 #if 0
@@ -76,7 +84,7 @@ void PPS_Tick(DRILL_STATUS *dst) {
         dst->F_PPS = 1;
         dst->TI++;
         ti = 0;
-        HAL_GPIO_TogglePin(CPU_MON_GPIO_Port, CPU_MON_Pin);
+        //HAL_GPIO_TogglePin(CPU_MON_GPIO_Port, CPU_MON_Pin);
     }
 }
 /**
@@ -108,6 +116,11 @@ void make_HK(DRILL_STATUS *dst, uint8_t *fname) {
 
     uint8_t sum, i;
     static uint16_t data;
+    bno055_vector_t v;
+    int16_t mag_xyz[3];
+
+    //******計測スタート
+    HAL_GPIO_WritePin(CPU_MON_GPIO_Port, CPU_MON_Pin, GPIO_PIN_SET);
 
     //ファイル名
     //sprintf(fname,"%08d.bin",dst->TI/FILE_RENEW_SEC);
@@ -157,35 +170,82 @@ void make_HK(DRILL_STATUS *dst, uint8_t *fname) {
     dst->flm.elm.MAG_Y = 30;
     dst->flm.elm.MAG_Z = 31;
 
-    //MCP3424 ad0=0,ad1=0
-    if (MCP3424_Read(MCP3424_HV_ADDR, MOT_V_CH, &data) == 0) dst->flm.elm.MOT_V = data >> 6;
-    HAL_Delay(20);
-    if (MCP3424_Read(MCP3424_HV_ADDR, MOT_I_CH, &data) == 0) dst->flm.elm.MOT_I = data >> 6;
-    HAL_Delay(20);
-    if (MCP3424_Read(MCP3424_HV_ADDR, MOT_R_CH, &data) == 0) dst->flm.elm.MOT_R = data >> 6;
-    HAL_Delay(20);
-    if (MCP3424_Read(MCP3424_HV_ADDR, PDU_V_CH, &data) == 0) dst->flm.elm.PDU_V = data >> 6;
-    HAL_Delay(20);
+#if 1
+    //気温・湿度・圧力
+    bme280_set_sensor_mode(BME280_FORCED_MODE, &bme_dev);
+    HAL_Delay(40);
+    if (bme280_get_sensor_data(BME280_ALL, &comp_data, &bme_dev) == 0) {
+        dst->flm.elm.SYS_T = comp_data.temperature / 100.0;
+        dst->flm.elm.SYS_H = comp_data.humidity / 1024.0;
+        double atm = ((double)comp_data.pressure / 10000.0)/1024.0;
+        dst->flm.elm.SYS_P = (u_int8_t)(round(atm));
+    }
+#endif
 
-    //MCP3424 ad0=1,ad1=0
-    if (MCP3424_Read(MCP3424_PT100_ADDR, BAT_T_CH, &data) == 0) dst->flm.elm.BAT_T = data >> 6;
-    HAL_Delay(20);
-    if (MCP3424_Read(MCP3424_PT100_ADDR, LIQ2_T_CH, &data) == 0) dst->flm.elm.LIQ2_T = data;
-    HAL_Delay(20);
-    if (MCP3424_Read(MCP3424_PT100_ADDR, MOT_T_CH, &data) == 0) dst->flm.elm.MOT_T = data >> 6;
-    HAL_Delay(20);
-    if (MCP3424_Read(MCP3424_PT100_ADDR, GEA_T_CH, &data) == 0) dst->flm.elm.GEA_T = data >> 6;
-    HAL_Delay(20);
+#if 0
+    //加速度
+    v = bno055_getVectorGravity();  //Unit m/s^2
+    dst->flm.elm.GRA_X = v.x*100;
+    dst->flm.elm.GRA_Y = v.y*100;
+    dst->flm.elm.GRA_Z = v.z*100;
+    v = bno055_getVectorGyroscope(); //Unit deg/sec
+    dst->flm.elm.ROT_X = v.x*100;
+    dst->flm.elm.ROT_Y = v.y*100;
+    dst->flm.elm.ROT_Z = v.z*100;
+    v = bno055_getVectorLinearAccel(); //Unit m/s^2
+    dst->flm.elm.ACC_X = v.x*100;
+    dst->flm.elm.ACC_Y = v.y*100;
+    dst->flm.elm.ACC_Z = v.z*100;
+#endif
 
-    //MCP3424 d0=0,ad1=1
-    if (MCP3424_Read(MCP3424_LVDT_ADDR, GND_P_CH, &data) == 0) dst->flm.elm.GND_P = data;
-    HAL_Delay(20);
-    if (MCP3424_Read(MCP3424_LVDT_ADDR, BAT_V_CH, &data) == 0) dst->flm.elm.BAT_V = data >> 6;
-    HAL_Delay(20);
-    if (MCP3424_Read(MCP3424_LVDT_ADDR, LIQ1_P_CH, &data) == 0) dst->flm.elm.LIQ1_P = data;
-    HAL_Delay(20);
-    if (MCP3424_Read(MCP3424_LVDT_ADDR, LIQ1_T_CH, &data) == 0) dst->flm.elm.LIQ1_T = data;
-    HAL_Delay(20);
+#if 1
+    //磁場 *0.042で uT
+    BM1422_read_mag(mag_xyz);
+    dst->flm.elm.MAG_X = mag_xyz[0];
+    dst->flm.elm.MAG_Y = mag_xyz[1];
+    dst->flm.elm.MAG_Z = mag_xyz[2];
+
+    //ここまで80ms
+    //HAL_GPIO_WritePin(CPU_MON_GPIO_Port, CPU_MON_Pin, GPIO_PIN_RESET);
+#endif
+
+#if 1
+    //MCP3424 MCP3424_HV_ADDR, ad0=0,ad1=0
+    //MCP3424 MCP3424_PT100_ADDR, ad0=1,ad1=0
+    //MCP3424 MCP3424_PT100_ADDR, d0=0,ad1=1
+    //変換時間に66msかかるので、ICごとに指令をずらして出す
+    MCP3424_Ask(MCP3424_HV_ADDR, MOT_V_CH);
+    MCP3424_Ask(MCP3424_PT100_ADDR, BAT_T_CH);
+    MCP3424_Ask(MCP3424_LVDT_ADDR, GND_P_CH);
+    HAL_Delay(70);
+    if (MCP3424_Ans(MCP3424_HV_ADDR, &data) == 0) dst->flm.elm.MOT_V = data >> 6;
+    if (MCP3424_Ans(MCP3424_PT100_ADDR, &data) == 0) dst->flm.elm.BAT_T = data >> 6;
+    if (MCP3424_Ans(MCP3424_LVDT_ADDR, &data) == 0) dst->flm.elm.GND_P = data >> 6;
+    //
+    MCP3424_Ask(MCP3424_HV_ADDR, MOT_I_CH);
+    MCP3424_Ask(MCP3424_PT100_ADDR, LIQ2_T_CH);
+    MCP3424_Ask(MCP3424_LVDT_ADDR, BAT_V_CH);
+    HAL_Delay(70);
+    if (MCP3424_Ans(MCP3424_HV_ADDR, &data) == 0) dst->flm.elm.MOT_I = data >> 6;
+    if (MCP3424_Ans(MCP3424_PT100_ADDR, &data) == 0) dst->flm.elm.LIQ2_T = data;
+    if (MCP3424_Ans(MCP3424_LVDT_ADDR,  &data) == 0) dst->flm.elm.BAT_V = data >> 6;
+    //
+    MCP3424_Ask(MCP3424_HV_ADDR, MOT_R_CH);
+    MCP3424_Ask(MCP3424_PT100_ADDR, MOT_T_CH);
+    MCP3424_Ask(MCP3424_LVDT_ADDR, LIQ1_P_CH);
+    HAL_Delay(70);
+    if (MCP3424_Ans(MCP3424_HV_ADDR, &data) == 0) dst->flm.elm.MOT_R = data >> 6;
+    if (MCP3424_Ans(MCP3424_PT100_ADDR, &data) == 0) dst->flm.elm.MOT_T = data >> 6;
+    if (MCP3424_Ans(MCP3424_LVDT_ADDR,  &data) == 0) dst->flm.elm.LIQ1_P = data;
+    //
+    MCP3424_Ask(MCP3424_HV_ADDR, PDU_V_CH);
+    MCP3424_Ask(MCP3424_PT100_ADDR, GEA_T_CH);
+    MCP3424_Ask(MCP3424_LVDT_ADDR, LIQ1_T_CH);
+    HAL_Delay(70);
+    if (MCP3424_Ans(MCP3424_HV_ADDR, &data) == 0) dst->flm.elm.PDU_V = data >> 6;
+    if (MCP3424_Ans(MCP3424_PT100_ADDR, &data) == 0) dst->flm.elm.GEA_T = data >> 6;
+    if (MCP3424_Ans(MCP3424_LVDT_ADDR, &data) == 0) dst->flm.elm.LIQ1_T = data;
+#endif
 
     //エンコード
     dst->flm.elm.GND_P = __builtin_bswap16(dst->flm.elm.GND_P);
@@ -211,6 +271,9 @@ void make_HK(DRILL_STATUS *dst, uint8_t *fname) {
         sum += dst->flm.buf[i];
     };
     dst->flm.buf[N_FLAME - 1] = sum;
+
+    //******計測終了
+    HAL_GPIO_WritePin(CPU_MON_GPIO_Port, CPU_MON_Pin, GPIO_PIN_RESET);
 }
 
 void Lib_dump_3f(int type, float x, float y, float z) {
@@ -226,6 +289,9 @@ void Lib_dump_3f(int type, float x, float y, float z) {
         case DTP_GAY:
             strcpy(fmt, "gyro x:%f y:%f z:%f\r\n");
             break;
+        case DTP_ACC:
+            strcpy(fmt, "acc x:%f y:%f z:%f\r\n");
+            break;
         case DTP_HUM:
             strcpy(fmt, "tmp  t:%f hum:%f atm:%f\r\n");
             break;
@@ -236,7 +302,7 @@ void Lib_dump_3f(int type, float x, float y, float z) {
     HAL_UART_Transmit_DMA(&huart2, msg, strlen(msg));
 }
 
-void Lib_dump_ad(int8_t ch, int8_t rtc[], uint16_t data[]) {
+void Lib_dump_ad(int8_t rtc[], uint16_t data[]) {
     char msg[64];
     sprintf(msg, "ad %d:%04X %d:%04X %d:%04X %d:%04X\r\n",
             rtc[0], data[0], rtc[1], data[1], rtc[2], data[2], rtc[3], data[3]);

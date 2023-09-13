@@ -249,12 +249,20 @@ void bno055_dump()
     bno055_vector_t v;
     while (1)
     {
+#if 1
         v = bno055_getVectorGravity();
         Lib_dump_3f(DTP_GRA,(float)v.x,(float)v.y,(float)v.z);
         HAL_Delay(1000);
-
-        //v = bno055_getVectorGyroscope();
-        //Lib_dump_3f(DTP_GAY,(float)v.x,(float)v.y,(float)v.z);
-        //HAL_Delay(1000);
+#endif
+#if 0
+        v = bno055_getVectorLinearAccel();
+        Lib_dump_3f(DTP_ACC,(float)v.x,(float)v.y,(float)v.z);
+        HAL_Delay(1000);
+#endif
+#if 0
+        v = bno055_getVectorGyroscope();
+        Lib_dump_3f(DTP_GAY,(float)v.x,(float)v.y,(float)v.z);
+        HAL_Delay(1000);
+#endif
     }
 }
