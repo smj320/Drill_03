@@ -307,6 +307,7 @@ void bno055_setAxisMap(bno055_axis_map_t axis);
  *
  */
 void bno055_dump();
+int bno055_pullData(uint8_t reg, uint16_t *data, uint8_t len, uint32_t *err);
 
 #ifdef __cplusplus
   }
