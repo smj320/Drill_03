@@ -202,8 +202,8 @@ void make_HK(DRILL_STATUS *dst, uint8_t *fname) {
 #endif
 
 #if 1
-    //磁場 *0.042で uT
-    BM1422_read_mag(mag_xyz);
+    //磁場, 24で割るとuTになる
+    BM1422_getVal(mag_xyz);
     dst->flm.elm.MAG_X = mag_xyz[0];
     dst->flm.elm.MAG_Y = mag_xyz[1];
     dst->flm.elm.MAG_Z = mag_xyz[2];

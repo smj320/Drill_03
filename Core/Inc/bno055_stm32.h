@@ -56,18 +56,6 @@ int bno055_readData(uint8_t reg, uint8_t *data, uint8_t len) {
   // I2C_MEMADD_SIZE_8BIT, data, len, 100);
 }
 
-int bno055_pullData(uint8_t reg, uint16_t *data, uint8_t len, uint32_t *err) {
-    HAL_StatusTypeDef stat;
-    stat = HAL_I2C_Mem_Read(_bno055_i2c_port, BNO055_I2C_ADDR << 1, 0x50, 2, data, 3,100);
-    if(stat==HAL_OK){
-        return 0;
-    }else{
-        *err = HAL_I2C_GetError(_bno055_i2c_port);
-        __HAL_I2C_CLEAR_FLAG(_bno055_i2c_port, *err);
-        return -1;
-    }
-}
-
 #ifdef __cplusplus
   }
 #endif

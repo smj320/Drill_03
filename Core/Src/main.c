@@ -140,8 +140,8 @@ int main(void)
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
     //Geo_mag
-    BM1422_Init();
-    //BM1422_dump();
+    BM1422_Init(&hi2c1);
+    //BM1422_dump(&hi2c1);
 
     //BME280
     bme_dev.dev_id = BME280_I2C_ADDR_PRIM;
