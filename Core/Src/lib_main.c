@@ -79,7 +79,7 @@ _Noreturn void drill_loop(DRILL_STATUS *dst) {
 static int ti = 0;
 
 void PPS_Tick(DRILL_STATUS *dst) {
-    //1PPSカウント
+    //1PPSカウントアップ
     if (ti++ == 1000) {
         dst->F_PPS = 1;
         dst->TI++;
@@ -118,9 +118,10 @@ void make_HK(DRILL_STATUS *dst, uint8_t *fname) {
     static uint16_t data;
     bno055_vector_t v;
     int16_t mag_xyz[3];
+    static double absG, grav0[3]={0.0, 0.0, 0.0};
 
     //******計測スタート
-    HAL_GPIO_WritePin(CPU_MON_GPIO_Port, CPU_MON_Pin, GPIO_PIN_SET);
+    //HAL_GPIO_WritePin(CPU_MON_GPIO_Port, CPU_MON_Pin, GPIO_PIN_SET);
 
     //ファイル名
     //sprintf(fname,"%08d.bin",dst->TI/FILE_RENEW_SEC);
@@ -184,21 +185,35 @@ void make_HK(DRILL_STATUS *dst, uint8_t *fname) {
 #endif
 
 #if 1
-    //加速度
+    //重力加速度
+    //重力加速度の絶対値が8.0~12.0の範囲外なら前の値を使う。
     v = bno055_getVectorGravity();  //Unit m/s^2
-    dst->flm.elm.GRA_X = v.x*100;
-    dst->flm.elm.GRA_Y = v.y*100;
-    dst->flm.elm.GRA_Z = v.z*100;
+    absG = sqrt(v.x * v.x + v.y * v.y + v.z*v.z);
+    if(8.0 < absG && absG<12.0){
+        dst->flm.elm.GRA_X = (int16_t)(v.x*100);
+        dst->flm.elm.GRA_Y = (int16_t)(v.y*100);
+        dst->flm.elm.GRA_Z = (int16_t)(v.z*100);
+        grav0[0] = v.x;
+        grav0[1] = v.y;
+        grav0[2] = v.z;
+    }else{
+        dst->flm.elm.GRA_X = (int16_t)(grav0[0]*100);
+        dst->flm.elm.GRA_Y = (int16_t)(grav0[1]*100);
+        dst->flm.elm.GRA_Z = (int16_t)(grav0[2]*100);
+    }
+
     HAL_Delay(10);
+    //角速度
     v = bno055_getVectorGyroscope(); //Unit deg/sec
-    dst->flm.elm.ROT_X = v.x*100;
-    dst->flm.elm.ROT_Y = v.y*100;
-    dst->flm.elm.ROT_Z = v.z*100;
+    dst->flm.elm.ROT_X = (int16_t)(v.x*100);
+    dst->flm.elm.ROT_Y = (int16_t)(v.y*100);
+    dst->flm.elm.ROT_Z = (int16_t)(v.z*100);
     HAL_Delay(10);
+    //並進加速度
     v = bno055_getVectorLinearAccel(); //Unit m/s^2
-    dst->flm.elm.ACC_X = v.x*100;
-    dst->flm.elm.ACC_Y = v.y*100;
-    dst->flm.elm.ACC_Z = v.z*100;
+    dst->flm.elm.ACC_X = (int16_t)(v.x*100);
+    dst->flm.elm.ACC_Y = (int16_t)(v.y*100);
+    dst->flm.elm.ACC_Z = (int16_t)(v.z*100);
     HAL_Delay(10);
 #endif
 
@@ -258,7 +273,7 @@ void make_HK(DRILL_STATUS *dst, uint8_t *fname) {
     dst->flm.buf[N_FLAME - 1] = sum;
 
     //******計測終了
-    HAL_GPIO_WritePin(CPU_MON_GPIO_Port, CPU_MON_Pin, GPIO_PIN_RESET);
+    //HAL_GPIO_WritePin(CPU_MON_GPIO_Port, CPU_MON_Pin, GPIO_PIN_RESET);
 }
 
 void Lib_dump_3f(int type, float x, float y, float z) {
