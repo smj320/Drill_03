@@ -19,40 +19,41 @@
 union tlm_flame {
     uint8_t buf[N_FLAME];
     struct {
-        uint32_t FS;
-        uint32_t TI;
-        uint8_t STAT;
-        int8_t PDU_V;
-        int8_t DMY1;
-        int8_t BAT_V;
-        int8_t BAT_T;
-        int8_t SYS_T;
-        int8_t SYS_H;
-        int8_t SYS_P;
-        int16_t GND_P;
-        int8_t MOT_V;
-        int8_t MOT_I;
-        int8_t MOT_T;
-        int8_t GEA_T;
-        int8_t MOT_R;
-        int16_t LIQ1_T;
-        int16_t LIQ1_P;
-        int16_t LIQ2_T;
-        int16_t BOA_D;
-        int16_t GRA_X;
-        int16_t GRA_Y;
-        int16_t GRA_Z;
-        int16_t ACC_X;
-        int16_t ACC_Y;
-        int16_t ACC_Z;
-        int16_t ROT_X;
-        int16_t ROT_Y;
-        int16_t ROT_Z;
-        int16_t MAG_X;
-        int16_t MAG_Y;
-        int16_t MAG_Z;
-        uint16_t PAD;
-        uint16_t SUM;
+        uint32_t FS; //0
+        uint32_t TI; //1
+        uint8_t STAT; //2
+        int8_t PDU_V;   //3
+        int8_t DMY1;    //4
+        int8_t BAT_V;   //5
+        int8_t BAT_T;   //6
+        int8_t SYS_T;   //7
+        int8_t SYS_H;   //8
+        int8_t SYS_P;   //9
+        int16_t GND_P;  //10
+        int8_t MOT_V;   //11
+        int8_t MOT_I;   //12
+        int8_t MOT_T;   //13
+        int8_t GEA_T;   //14
+        int8_t MOT_R;   //15
+        int8_t PAD1;   //15
+        int16_t LIQ1_T; //16
+        int16_t LIQ1_P; //17
+        int16_t LIQ2_T; //18
+        int16_t BOA_D;  //19
+        int16_t GRA_X;  //20
+        int16_t GRA_Y;  //21
+        int16_t GRA_Z;  //22
+        int16_t ACC_X;  //23
+        int16_t ACC_Y;  //24
+        int16_t ACC_Z;  //25
+        int16_t ROT_X;  //26
+        int16_t ROT_Y;  //27
+        int16_t ROT_Z;  //28
+        int16_t MAG_X;  //29
+        int16_t MAG_Y;  //30
+        int16_t MAG_Z;  //31
+        uint16_t PAD;   //32-
+        uint16_t SUM;   //80
     } elm;
 };
 

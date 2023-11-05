@@ -134,7 +134,7 @@ void make_HK(DRILL_STATUS *dst, uint8_t *fname) {
     dst->flm.elm.FS = __builtin_bswap32(0xEB9038C7);
 
     //フレームカウンタ
-    dst->flm.elm.TI = __builtin_bswap32(dst->TI);
+    dst->flm.elm.TI = dst->TI;
 
     //ファイル状態
     dst->flm.elm.STAT = ((dst->fOpen & 0x01) << 1) | ((dst->fMount) & 0x01);
@@ -153,6 +153,7 @@ void make_HK(DRILL_STATUS *dst, uint8_t *fname) {
     dst->flm.elm.MOT_T = 13;
     dst->flm.elm.GEA_T = 14;
     dst->flm.elm.MOT_R = 15;
+    dst->flm.elm.PAD1 = 0x55;
     dst->flm.elm.LIQ1_T = 16;
     dst->flm.elm.LIQ1_P = 17;
     dst->flm.elm.LIQ2_T = 18;
@@ -223,7 +224,7 @@ void make_HK(DRILL_STATUS *dst, uint8_t *fname) {
     HAL_Delay(70);
     if (MCP3424_Ans(MCP3424_HV_ADDR, &data) == 0) dst->flm.elm.MOT_V = data >> 8;
     if (MCP3424_Ans(MCP3424_PT100_ADDR, &data) == 0) dst->flm.elm.BAT_T = data >> 8;
-    if (MCP3424_Ans(MCP3424_LVDT_ADDR, &data) == 0) dst->flm.elm.GND_P = data >> 8;
+    if (MCP3424_Ans(MCP3424_LVDT_ADDR, &data) == 0) dst->flm.elm.GND_P = data;
     //
     MCP3424_Ask(MCP3424_HV_ADDR, MOT_I_CH);
     MCP3424_Ask(MCP3424_PT100_ADDR, LIQ2_T_CH);
@@ -249,25 +250,6 @@ void make_HK(DRILL_STATUS *dst, uint8_t *fname) {
     if (MCP3424_Ans(MCP3424_PT100_ADDR, &data) == 0) dst->flm.elm.GEA_T = data >> 8;
     if (MCP3424_Ans(MCP3424_LVDT_ADDR, &data) == 0) dst->flm.elm.LIQ1_T = data;
 #endif
-
-    //エンコード
-    dst->flm.elm.GND_P = __builtin_bswap16(dst->flm.elm.GND_P);
-    dst->flm.elm.LIQ1_T = __builtin_bswap16(dst->flm.elm.LIQ1_T);
-    dst->flm.elm.LIQ1_P = __builtin_bswap16(dst->flm.elm.LIQ1_P);
-    dst->flm.elm.LIQ2_T = __builtin_bswap16(dst->flm.elm.LIQ2_T);
-    dst->flm.elm.BOA_D = __builtin_bswap16(dst->flm.elm.BOA_D);
-    dst->flm.elm.GRA_X = __builtin_bswap16(dst->flm.elm.GRA_X);
-    dst->flm.elm.GRA_Y = __builtin_bswap16(dst->flm.elm.GRA_Y);
-    dst->flm.elm.GRA_Z = __builtin_bswap16(dst->flm.elm.GRA_Z);
-    dst->flm.elm.ACC_X = __builtin_bswap16(dst->flm.elm.ACC_X);
-    dst->flm.elm.ACC_Y = __builtin_bswap16(dst->flm.elm.ACC_Y);
-    dst->flm.elm.ACC_Z = __builtin_bswap16(dst->flm.elm.ACC_Z);
-    dst->flm.elm.ROT_X = __builtin_bswap16(dst->flm.elm.ROT_X);
-    dst->flm.elm.ROT_Y = __builtin_bswap16(dst->flm.elm.ROT_Y);
-    dst->flm.elm.ROT_Z = __builtin_bswap16(dst->flm.elm.ROT_Z);
-    dst->flm.elm.MAG_X = __builtin_bswap16(dst->flm.elm.MAG_X);
-    dst->flm.elm.MAG_Y = __builtin_bswap16(dst->flm.elm.MAG_Y);
-    dst->flm.elm.MAG_Z = __builtin_bswap16(dst->flm.elm.MAG_Z);
 
     //チェックサム生成
     for (i = 1, sum = dst->flm.buf[0]; i <= N_FLAME - 2; i++) {
