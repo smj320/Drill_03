@@ -1,7 +1,7 @@
-#このファイルはテンプレートから自動生成されています！変更しないでください！
+#THIS FILE IS AUTO GENERATED FROM THE TEMPLATE! DO NOT CHANGE!
 set(CMAKE_SYSTEM_NAME Generic)
 set(CMAKE_SYSTEM_VERSION 1)
-cmake_minimum_required(VERSION 3.24)
+cmake_minimum_required(VERSION 3.27)
 
 # specify cross-compilers and tools
 set(CMAKE_C_COMPILER arm-none-eabi-gcc)
@@ -59,7 +59,7 @@ file(GLOB_RECURSE SOURCES "Core/*.*" "Drivers/*.*")
 set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/STM32F303K8TX_FLASH.ld)
 
 add_link_options(-Wl,-gc-sections,--print-memory-usage,-Map=${PROJECT_BINARY_DIR}/${PROJECT_NAME}.map)
-add_link_options(-mcpu=cortex-m4 -mthumb -mthumb-interwork)
+add_link_options(-mcpu=cortex-m4 -mthumb -mthumb-interwork -fcommon)
 add_link_options(-T ${LINKER_SCRIPT})
 
 add_executable(${PROJECT_NAME}.elf ${SOURCES} ${LINKER_SCRIPT})

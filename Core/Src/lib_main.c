@@ -187,15 +187,16 @@ void make_HK(DRILL_STATUS *dst, uint8_t *fname) {
 #if 1
     //重力加速度
     //重力加速度の絶対値が8.0~12.0の範囲外なら前の値を使う。
+    //ドリル座標系はX=y, Y=-x, Z=-z
     v = bno055_getVectorGravity();  //Unit m/s^2
     absG = sqrt(v.x * v.x + v.y * v.y + v.z*v.z);
     if(8.0 < absG && absG<12.0){
-        dst->flm.elm.GRA_X = (int16_t)(v.x*100);
-        dst->flm.elm.GRA_Y = (int16_t)(v.y*100);
-        dst->flm.elm.GRA_Z = (int16_t)(v.z*100);
-        grav0[0] = v.x;
-        grav0[1] = v.y;
-        grav0[2] = v.z;
+        dst->flm.elm.GRA_X = (int16_t)(v.y*100);
+        dst->flm.elm.GRA_Y = (int16_t)(-v.x*100);
+        dst->flm.elm.GRA_Z = (int16_t)(-v.z*100);
+        grav0[0] = v.y;
+        grav0[1] = -v.x;
+        grav0[2] = -v.z;
     }else{
         dst->flm.elm.GRA_X = (int16_t)(grav0[0]*100);
         dst->flm.elm.GRA_Y = (int16_t)(grav0[1]*100);
@@ -205,24 +206,25 @@ void make_HK(DRILL_STATUS *dst, uint8_t *fname) {
     HAL_Delay(10);
     //角速度
     v = bno055_getVectorGyroscope(); //Unit deg/sec
-    dst->flm.elm.ROT_X = (int16_t)(v.x*100);
-    dst->flm.elm.ROT_Y = (int16_t)(v.y*100);
-    dst->flm.elm.ROT_Z = (int16_t)(v.z*100);
+    dst->flm.elm.ROT_X = (int16_t)(v.y*100);
+    dst->flm.elm.ROT_Y = (int16_t)(-v.x*100);
+    dst->flm.elm.ROT_Z = (int16_t)(-v.z*100);
     HAL_Delay(10);
     //並進加速度
     v = bno055_getVectorLinearAccel(); //Unit m/s^2
-    dst->flm.elm.ACC_X = (int16_t)(v.x*100);
-    dst->flm.elm.ACC_Y = (int16_t)(v.y*100);
-    dst->flm.elm.ACC_Z = (int16_t)(v.z*100);
+    dst->flm.elm.ACC_X = (int16_t)(v.y*100);
+    dst->flm.elm.ACC_Y = (int16_t)(-v.x*100);
+    dst->flm.elm.ACC_Z = (int16_t)(-v.z*100);
     HAL_Delay(10);
 #endif
 
 #if 1
     //磁場, 24で割るとuTになる
+    //ドリル座標系はX=-y, Y=x, Z=-z
     BM1422_getVal(mag_xyz);
-    dst->flm.elm.MAG_X = mag_xyz[0];
-    dst->flm.elm.MAG_Y = mag_xyz[1];
-    dst->flm.elm.MAG_Z = mag_xyz[2];
+    dst->flm.elm.MAG_X = (int16_t )(-mag_xyz[1]);
+    dst->flm.elm.MAG_Y = (int16_t )(mag_xyz[0]);
+    dst->flm.elm.MAG_Z = (int16_t )(-mag_xyz[2]);
 
     //ここまで80ms
     //HAL_GPIO_WritePin(CPU_MON_GPIO_Port, CPU_MON_Pin, GPIO_PIN_RESET);
