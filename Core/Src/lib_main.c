@@ -220,11 +220,11 @@ void make_HK(DRILL_STATUS *dst, uint8_t *fname) {
 
 #if 1
     //磁場, 24で割るとuTになる
-    //ドリル座標系はX=-y, Y=x, Z=-z
+    //ドリル座標系はX=y, Y=-x, Z=z
     BM1422_getVal(mag_xyz);
-    dst->flm.elm.MAG_X = (int16_t )(-mag_xyz[1]);
-    dst->flm.elm.MAG_Y = (int16_t )(mag_xyz[0]);
-    dst->flm.elm.MAG_Z = (int16_t )(-mag_xyz[2]);
+    dst->flm.elm.MAG_X = (int16_t )(mag_xyz[1]);
+    dst->flm.elm.MAG_Y = (int16_t )(-mag_xyz[0]);
+    dst->flm.elm.MAG_Z = (int16_t )(mag_xyz[2]);
 
     //ここまで80ms
     //HAL_GPIO_WritePin(CPU_MON_GPIO_Port, CPU_MON_Pin, GPIO_PIN_RESET);
