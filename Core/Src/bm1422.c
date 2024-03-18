@@ -9,7 +9,7 @@ int BM1422_Init() {
     volatile HAL_StatusTypeDef s;
     uint8_t wia, sta1;
     uint8_t cnt1 = BM1422AGMV_CNTL1_VAL;
-    uint16_t cnt4[2] = {0,0};;
+    uint8_t cnt4[2] = {0,0};;
 
     s = HAL_I2C_Mem_Read(&hi2c1, BM1422_ADR << 1, BM1422AGMV_WIA, 1, &wia, 1, 100);
     if (s != HAL_OK) return -1;
