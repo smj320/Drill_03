@@ -5,7 +5,6 @@
 //
 #include "main.h"
 #include "string.h"
-#include "time.h"
 #include "drill_mon.h"
 #include "bme280.h"
 #include "mcp3424.h"
@@ -155,22 +154,22 @@ void make_HK(DRILL_STATUS *dst, uint8_t *fname) {
     dst->flm.elm.GEA_T = 14;
     dst->flm.elm.MOT_R = 15;
     dst->flm.elm.PAD1 = 0x55;
-    dst->flm.elm.LIQ1_T = 16;
-    dst->flm.elm.LIQ1_P = 17;
-    dst->flm.elm.LIQ2_T = 18;
-    dst->flm.elm.BOA_D = 19;
-    dst->flm.elm.GRA_X = 20;
-    dst->flm.elm.GRA_Y = 21;
-    dst->flm.elm.GRA_Z = 22;
-    dst->flm.elm.ACC_X = 23;
-    dst->flm.elm.ACC_Y = 24;
-    dst->flm.elm.ACC_Z = 25;
-    dst->flm.elm.ROT_X = 26;
-    dst->flm.elm.ROT_Y = 27;
-    dst->flm.elm.ROT_Z = 28;
-    dst->flm.elm.MAG_X = 29;
-    dst->flm.elm.MAG_Y = 30;
-    dst->flm.elm.MAG_Z = 31;
+    dst->flm.elm.LIQ1_T = 17;
+    dst->flm.elm.LIQ1_P = 18;
+    dst->flm.elm.LIQ2_T = 19;
+    dst->flm.elm.BOA_D = 20;
+    dst->flm.elm.GRA_X = 21;
+    dst->flm.elm.GRA_Y = 22;
+    dst->flm.elm.GRA_Z = 23;
+    dst->flm.elm.ACC_X = 24;
+    dst->flm.elm.ACC_Y = 25;
+    dst->flm.elm.ACC_Z = 26;
+    dst->flm.elm.ROT_X = 27;
+    dst->flm.elm.ROT_Y = 28;
+    dst->flm.elm.ROT_Z = 29;
+    dst->flm.elm.MAG_X = 30;
+    dst->flm.elm.MAG_Y = 31;
+    dst->flm.elm.MAG_Z = 32;
 
 #if 1
     //気温・湿度・圧力

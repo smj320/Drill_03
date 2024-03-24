@@ -137,7 +137,8 @@ int main(void)
   MX_TIM6_Init();
   MX_I2C1_Init();
   /* USER CODE BEGIN 2 */
-
+  //気温センサの起動待ち
+  HAL_Delay(2000);
 
     //Geo_mag
 #if 1

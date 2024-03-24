@@ -19,40 +19,40 @@
 union tlm_flame {
     uint8_t buf[N_FLAME];
     struct {
-        uint32_t FS; //0
-        uint32_t TI; //1
-        uint8_t STAT; //2
-        int8_t PDU_V;   //3
-        int8_t DMY1;    //4
-        int8_t BAT_V;   //5
-        int8_t BAT_T;   //6
-        int8_t SYS_T;   //7
-        int8_t SYS_H;   //8
-        int8_t SYS_P;   //9
-        int16_t GND_P;  //10
-        int8_t MOT_V;   //11
-        int8_t MOT_I;   //12
-        int8_t MOT_T;   //13
-        int8_t GEA_T;   //14
-        int8_t MOT_R;   //15
-        int8_t PAD1;   //15
-        int16_t LIQ1_T; //16
-        int16_t LIQ1_P; //17
-        int16_t LIQ2_T; //18
-        int16_t BOA_D;  //19
-        int16_t GRA_X;  //20
-        int16_t GRA_Y;  //21
-        int16_t GRA_Z;  //22
-        int16_t ACC_X;  //23
-        int16_t ACC_Y;  //24
-        int16_t ACC_Z;  //25
-        int16_t ROT_X;  //26
-        int16_t ROT_Y;  //27
-        int16_t ROT_Z;  //28
-        int16_t MAG_X;  //29
-        int16_t MAG_Y;  //30
-        int16_t MAG_Z;  //31
-        uint16_t PAD;   //32-
+        uint32_t FS;    //0
+        uint32_t TI;    //4
+        uint8_t STAT;   //8
+        int8_t PDU_V;   //9
+        int8_t DMY1;    //10
+        int8_t BAT_V;   //11
+        int8_t BAT_T;   //12
+        int8_t SYS_T;   //13
+        int8_t SYS_H;   //14
+        int8_t SYS_P;   //15
+        int16_t GND_P;  //16
+        int8_t MOT_V;   //18
+        int8_t MOT_I;   //19
+        int8_t MOT_T;   //20
+        int8_t GEA_T;   //21
+        int8_t MOT_R;   //22
+        int8_t PAD1;    //23
+        int16_t LIQ1_T; //24
+        int16_t LIQ1_P; //26
+        int16_t LIQ2_T; //28
+        int16_t BOA_D;  //30
+        int16_t GRA_X;  //32
+        int16_t GRA_Y;  //34
+        int16_t GRA_Z;  //36
+        int16_t ACC_X;  //38
+        int16_t ACC_Y;  //40
+        int16_t ACC_Z;  //42
+        int16_t ROT_X;  //44
+        int16_t ROT_Y;  //46
+        int16_t ROT_Z;  //48
+        int16_t MAG_X;  //50
+        int16_t MAG_Y;  //52
+        int16_t MAG_Z;  //54
+        uint16_t PAD;   //56
         uint16_t SUM;   //80
     } elm;
 };
@@ -97,8 +97,8 @@ _Noreturn void drill_loop(DRILL_STATUS *dst);
 
 //各種デバイス定数,chは0base
 #define MCP3424_HV_ADDR 0x68 //ad0=0,ad1=0
-#define MOT_V_CH 0
-#define MOT_I_CH 1
+#define MOT_I_CH 0
+#define MOT_V_CH 1
 #define MOT_R_CH 2
 #define PDU_V_CH 3
 #define MCP3424_PT100_ADDR 0x6C //d0=1,ad1=0
