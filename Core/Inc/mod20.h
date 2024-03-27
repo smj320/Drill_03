@@ -7,10 +7,11 @@
 
 #include "main.h"
 
-#define MOD20_I2C_ADDR
+#define MOD20_I2C_ADDR 0xA4
 
 void mod20_Init(I2C_HandleTypeDef *hi2c1);
-void mod32_read(I2C_HandleTypeDef *hi2c1, uint8_t *buf, int len);
-void mod32_write(I2C_HandleTypeDef *hi2c1, uint8_t *buf, int len);
+void mod20_open(I2C_HandleTypeDef *hi2c1, uint16_t nf);
+void mod20_close(I2C_HandleTypeDef *hi2c1);
+void mod20_write80byte(I2C_HandleTypeDef *hi2c1, uint8_t *buf);
 
 #endif //DRILL03_MOD20_H

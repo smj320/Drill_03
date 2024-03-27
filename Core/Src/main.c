@@ -29,6 +29,7 @@
 #include "bme280.h"
 #include "bno055_stm32.h"
 #include "mcp3424.h"
+#include "mod20.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -177,70 +178,7 @@ int main(void)
     //MCP3424_dump(MCP3424_LVDT_ADDR);
 
     //SD
-#if 0
-    static char cmdVar[]="V\n";
-    static char cmdInit[]="I M:\n";
-    static char cmdOpen[]="O 1W>M:\\100000.TXT\n";
-    static char cmdCls[]="C 1\n";
-    static char cmdW80[]="W 1>50\n";
-    static uint8_t  sTx[80], sRx[80];
-    volatile HAL_StatusTypeDef s;
-    static int i;
-    //バナー読み出し
-    HAL_GPIO_WritePin(SD_RST_GPIO_Port,SD_RST_Pin,GPIO_PIN_RESET);
-    HAL_Delay(1);
-    HAL_GPIO_WritePin(SD_RST_GPIO_Port,SD_RST_Pin,GPIO_PIN_SET);
-    HAL_Delay(20); //リセット後20msec待機必須
-    for(i=0; i<120; i++){
-        s = HAL_I2C_Master_Receive(&hi2c1, 0xA4, &sRx[i], 1, 10);
-        if(sRx[i]==0x00) break;
-    };
-    //バージョン確認
-    s = HAL_I2C_Master_Transmit(&hi2c1, 0xA4, cmdVar, strlen(cmdVar), 10);
-    HAL_Delay(1);
-    for (i = 0; i < 120; i++) {
-        s = HAL_I2C_Master_Receive(&hi2c1, 0xA4, &sRx[i], 1, 10);
-        if(sRx[i]==0x00) break;
-    };
-    //初期化
-    s = HAL_I2C_Master_Transmit(&hi2c1, 0xA4, cmdInit, strlen(cmdInit), 10);
-    HAL_Delay(20);
-    int cnt=0;
-    uint8_t rcv;
-    do{
-        s = HAL_I2C_Master_Receive(&hi2c1, 0xA4, &rcv, 1, 10);
-        if(s==HAL_OK) sRx[cnt++] = rcv;
-    }while(rcv!='\n');
-    //オープン
-    s = HAL_I2C_Master_Transmit(&hi2c1, 0xA4, cmdOpen, strlen(cmdOpen), 10);
-    HAL_Delay(20);
-    for (int i = 0; i < 80; i++) {
-        s = HAL_I2C_Master_Receive(&hi2c1, 0xA4, &sRx[i], 1, 10);
-        if(sRx[i]==0x00) break;
-    };
-
-    //データ書き込指示
-    for(i=0;i<80;i++) sTx[i]=i;
-    s = HAL_I2C_Master_Transmit(&hi2c1, 0xA4, cmdW80, strlen(cmdW80), 10);
-    HAL_Delay(100);
-    for (i = 0; i < 80; i++) {
-        s = HAL_I2C_Master_Receive(&hi2c1, 0xA4, &sRx[i], 1, 10);
-        if(sRx[i]==0x00) break;
-    };
-    //データ書込実行
-    s = HAL_I2C_Master_Transmit(&hi2c1, 0xA4, sTx, 80, 10);
-    for (i = 0; i < 80; i++) {
-        s = HAL_I2C_Master_Receive(&hi2c1, 0xA4, &sRx[i], 1, 10);
-        if(sRx[i]==0x00) break;
-    };
-
-    //クローズ
-    s = HAL_I2C_Master_Transmit(&hi2c1, 0xA4, cmdCls, strlen(cmdCls)-1, 10);
-    for (i = 0; i < 40; i++) {
-        s = HAL_I2C_Master_Receive(&hi2c1, 0xA4, &sRx[i], 1, 10);
-        if(sRx[i]==0x00) break;
-    };
-#endif
+    mod20_Init(&hi2c1);
 
     //タイマスタート
     HAL_TIM_Base_Start_IT(&htim6);
