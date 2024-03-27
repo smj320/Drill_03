@@ -10,6 +10,7 @@
 #include "mcp3424.h"
 #include "bno055.h"
 #include "bm1422.h"
+#include "mod20.h"
 #include <stdio.h>
 #include <math.h>
 
@@ -31,6 +32,7 @@ void make_HK(DRILL_STATUS *dst, uint8_t *fName);
  */
 _Noreturn void drill_loop(DRILL_STATUS *dst) {
     //ファイル操作用
+    static int nf = 0;
     uint8_t fName[16];
     uint8_t txBuf[N_FLAME];
     uint8_t cc;
@@ -50,19 +52,16 @@ _Noreturn void drill_loop(DRILL_STATUS *dst) {
         HAL_UART_Transmit_DMA(&huart2, txBuf, N_FLAME);
 
         //初回動作または時刻の切れ目でファイルオープン
-#if 0
+#if 1
         if ((dst->TI % FILE_RENEW_SEC) == 0 || dst->isFirst == 1) {
             //初回でなければクローズ
-            if (dst->isFirst != 1) f_close(&fil);
+            if (dst->isFirst != 1) mod20_close(&hi2c1);
             //オープン
-            FRESULT result = f_open(&fil, (const char *) fName, FA_CREATE_ALWAYS | FA_WRITE);
-            dst->fOpen = (result == FR_OK) ? 1 : 0;
+            mod20_open(&hi2c1, nf++);
         }
 
         //データをSDカードに出力する。
-        UINT bw;
-        f_write(&fil, dst->flm.buf, N_FLAME, &bw);
-        f_sync(&fil);
+        mod20_write80byte(&hi2c1,txBuf);
 #endif
         //初回フラグクリア
         dst->isFirst = 0;
