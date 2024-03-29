@@ -4,7 +4,7 @@
 #include <string.h>
 #include "mod20.h"
 
-
+#define I2C_TIMEOUT 10
 #define N_RTC_BUF 80
 /**
  * リターンチェック
@@ -23,7 +23,7 @@ int check_rtc(I2C_HandleTypeDef *hi2c1, int nWait, int _nlf)
     for (nBusError=0, nlf = 0, i = 0; i < nWait; i++) {
         HAL_Delay( 1);
         xp = i % N_RTC_BUF;
-        s = HAL_I2C_Master_Receive(hi2c1, MOD20_I2C_ADDR, &cc, 1, 10);
+        s = HAL_I2C_Master_Receive(hi2c1, MOD20_I2C_ADDR, &cc, 1, I2C_TIMEOUT);
         if(s!=HAL_OK) nBusError++;
         if (cc == 0x00) continue;   //0x00ならスキップ
         rtcBuf[xp] = cc;            //0x00以外ならリングバッファに格納
@@ -34,6 +34,7 @@ int check_rtc(I2C_HandleTypeDef *hi2c1, int nWait, int _nlf)
     debug = 1;
     if(i==nWait) return -1; //タイムアウト
     if(nBusError!=0) return -2; //バスエラー
+    if(rtcBuf[xp-3]!='!' || rtcBuf[xp-2]!='0' || rtcBuf[xp-1]!='0') return -3; //エラーコードあり
     return 0;
 }
 
@@ -43,7 +44,6 @@ int check_rtc(I2C_HandleTypeDef *hi2c1, int nWait, int _nlf)
  * @return
  */
 int mod20_Init(I2C_HandleTypeDef *hi2c1) {
-    static char cmdVar[] = "V\n";
     static char cmdInit[] = "I M:\n";
     volatile HAL_StatusTypeDef s;
     static int rtc;
@@ -55,14 +55,14 @@ int mod20_Init(I2C_HandleTypeDef *hi2c1) {
     HAL_Delay(20); //リセット後20msec待機必須
 
     //バナー取得,0x0Aは!00の後を入れて5回
-    rtc = check_rtc(hi2c1, 1000, 5);
+    rtc = check_rtc(hi2c1, 500, 5);
     if(rtc!=0) return -1;
 
     //初期化コマンド送信
-    s = HAL_I2C_Master_Transmit(hi2c1, MOD20_I2C_ADDR, cmdInit, strlen(cmdInit), 10);
+    s = HAL_I2C_Master_Transmit(hi2c1, MOD20_I2C_ADDR, cmdInit, strlen(cmdInit), I2C_TIMEOUT);
 
     //リターンチェック,LFは一回
-    rtc = check_rtc(hi2c1, 10000, 1);
+    rtc = check_rtc(hi2c1, 500, 1);
     if(rtc!=0) return -2;
 
 #if 0
@@ -100,10 +100,10 @@ int mod20_open(I2C_HandleTypeDef *hi2c1, uint16_t nf) {
     }
 
     //オープンコマンド送信
-    s = HAL_I2C_Master_Transmit(hi2c1, MOD20_I2C_ADDR, cmdOpen, strlen(cmdOpen), 10);
+    s = HAL_I2C_Master_Transmit(hi2c1, MOD20_I2C_ADDR, cmdOpen, strlen(cmdOpen), I2C_TIMEOUT);
 
     //リターンチェック,LFは一回
-    rtc = check_rtc(hi2c1, 20000, 1);
+    rtc = check_rtc(hi2c1, 1000, 1);
     if(rtc!=0) return -1;
 
     //初期化正常終了
@@ -116,17 +116,17 @@ int mod20_write16byte(I2C_HandleTypeDef *hi2c1, uint8_t *buf) {
     static int rtc;
 
     //書き込み数コマンド送信
-    s = HAL_I2C_Master_Transmit(hi2c1, MOD20_I2C_ADDR, cmdW16, strlen(cmdW16), 10);
+    s = HAL_I2C_Master_Transmit(hi2c1, MOD20_I2C_ADDR, cmdW16, strlen(cmdW16), I2C_TIMEOUT);
 
     //リターンチェック,LFは一回
     rtc = check_rtc(hi2c1, 1000, 1);
     if(rtc!=0) return -10 + rtc;
 
     //データ書込コマンド送信
-    s = HAL_I2C_Master_Transmit(hi2c1, MOD20_I2C_ADDR, buf, 16, 10);
+    s = HAL_I2C_Master_Transmit(hi2c1, MOD20_I2C_ADDR, buf, 16, I2C_TIMEOUT);
 
     //リターンチェック,LFは一回
-    rtc = check_rtc(hi2c1, 10000, 2);
+    rtc = check_rtc(hi2c1, 1000, 2);
     if(rtc!=0) return -10 + rtc;
 
     //初期化正常終了
@@ -143,10 +143,10 @@ int mod20_write80byte(I2C_HandleTypeDef *hi2c1, uint8_t *buf) {
     for(int i=0;i<5;i++) mod20_write16byte(hi2c1, &buf[0x10*i]);
 
     //フラッシュコマンド送信
-    s = HAL_I2C_Master_Transmit(hi2c1, MOD20_I2C_ADDR, cmdFlush, strlen(cmdFlush), 10);
+    s = HAL_I2C_Master_Transmit(hi2c1, MOD20_I2C_ADDR, cmdFlush, strlen(cmdFlush), I2C_TIMEOUT);
 
     //リターンチェック,LFは一回
-    rtc = check_rtc(hi2c1, 2000, 1);
+    rtc = check_rtc(hi2c1, 1000, 1);
     HAL_GPIO_WritePin(CPU_MON_GPIO_Port, CPU_MON_Pin, 0);
     if(rtc!=0) return -10 + rtc;
 }
@@ -157,10 +157,10 @@ int mod20_close(I2C_HandleTypeDef *hi2c1) {
     static int rtc;
 
     //クローズコマンド送信
-    s = HAL_I2C_Master_Transmit(hi2c1, MOD20_I2C_ADDR, cmdCls, strlen(cmdCls), 10);
+    s = HAL_I2C_Master_Transmit(hi2c1, MOD20_I2C_ADDR, cmdCls, strlen(cmdCls), I2C_TIMEOUT);
 
     //リターンチェック,LFは一回
-    rtc = check_rtc(hi2c1, 5000, 1);
+    rtc = check_rtc(hi2c1, 1000, 1);
     if(rtc!=0) return rtc;
 
     //初期化正常終了

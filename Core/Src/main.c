@@ -60,7 +60,7 @@ DRILL_STATUS Dst;
 //bme280
 struct bme280_dev bme_dev;
 struct bme280_data comp_data;
-int8_t result;
+uint8_t F_STAT=0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -101,8 +101,6 @@ int8_t BME280_i2c_write(uint8_t id, uint8_t reg_addr, uint8_t *data, uint16_t le
     free(buf);
     return 0;
 }
-
-
 
 /* USER CODE END 0 */
 
@@ -149,6 +147,7 @@ int main(void)
 
 #if 1
     //BME280
+    int8_t result=0;
     bme_dev.dev_id = BME280_I2C_ADDR_PRIM;
     bme_dev.intf = BME280_I2C_INTF;
     bme_dev.read = BME280_i2c_read;
@@ -178,7 +177,8 @@ int main(void)
     //MCP3424_dump(MCP3424_LVDT_ADDR);
 
     //SD
-    mod20_Init(&hi2c1);
+    result = mod20_Init(&hi2c1);
+    if(result !=0) F_STAT |= ST_SD_INIT;
 
     //タイマスタート
     HAL_TIM_Base_Start_IT(&htim6);

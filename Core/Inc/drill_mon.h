@@ -10,10 +10,9 @@
 /**
  * 各種定数
  */
-#define FILE_RENEW_SEC 60   //ファイル更新間隔(秒)
+#define FILE_RENEW_SEC 60*60   //ファイル更新間隔(秒)
 /**
- * リトルエンディアンなので、普通に格納するとローバイトが先頭にくる。
- * 送り出す前にビッグエンディアンに直す必要がある。
+ * リトルエンディアンなので下位バイトが先にくる。
 */
 #define N_FLAME 80     //転送バッファ長
 union tlm_flame {
@@ -60,20 +59,22 @@ union tlm_flame {
 /**
  * Drillのステータス
  */
+//ファイルステータスビット
+#define ST_SD_INIT (1<<0)
+#define ST_SD_OPEN (1<<1)
+#define ST_SD_WRITE (1<<2)
+#define ST_SD_CLOSE (1<<3)
 typedef struct {
     uint32_t TI;            //フレームカウンタ
     uint8_t isFirst;        //初回動作か
     uint8_t F_PPS;          //1PPSの通知
     union tlm_flame flm;   //転送用バッファ
-    uint8_t fMount;         //FileMount OK=1, NG=0;
-    uint8_t fOpen;         //File open OK=1, NG=0;
+    uint8_t f_stat;         //ファイルステータスビット
 } DRILL_STATUS;
 
 /**
  * mainで使う割込関数の実体
  */
-void FS_Init(DRILL_STATUS *dst);
-
 void PPS_Tick(DRILL_STATUS *dst);
 
 //lib_mainにあるダンプ関数
@@ -86,7 +87,6 @@ enum {
 };
 
 void Lib_dump_3f(int type, float x, float y, float z);
-
 void Lib_dump_ad(int8_t rtc[], uint16_t data[]);
 
 /**
