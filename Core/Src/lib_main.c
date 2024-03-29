@@ -59,13 +59,14 @@ _Noreturn void drill_loop(DRILL_STATUS *dst) {
                 F_STAT = mod20_close(&hi2c1) ? F_STAT | ST_SD_CLOSE : F_STAT & ~ST_SD_CLOSE;
             }
             //オープン
-            F_STAT = mod20_open(&hi2c1, nf++) ? F_STAT | ST_SD_OPEN : F_STAT & ~ST_SD_OPEN;
+            F_STAT = mod20_open(&hi2c1, nf) ? F_STAT | ST_SD_OPEN : F_STAT & ~ST_SD_OPEN;
         }
 
         //データをSDカードに出力する。
         F_STAT = mod20_write80byte(&hi2c1, txBuf) ? F_STAT | ST_SD_WRITE : F_STAT & ~ST_SD_WRITE;
 #endif
         dst->TI ++;
+        nf = nf != 99999 ? 0: nf+1;
     }
 }
 
