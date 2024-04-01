@@ -38,12 +38,15 @@ _Noreturn void drill_loop(DRILL_STATUS *dst) {
     uint8_t txBuf[N_FLAME];
     uint8_t cc;
 
+    //ファイルオープン,reopenでタイムアウトになるので基本閉じない
+    F_STAT = mod20_open(&hi2c1, nf) ? F_STAT | ST_SD_OPEN : F_STAT & ~ST_SD_OPEN;
+
     //メインループ
     while (1) {
         //1PPSトリガ待機とフラグリセット
         while (dst->F_PPS != 1);
         dst->F_PPS = 0;
-        //HAL_GPIO_TogglePin(CPU_MON_GPIO_Port, CPU_MON_Pin);
+        HAL_GPIO_WritePin(CPU_MON_GPIO_Port, CPU_MON_Pin, 1);
 
         //HKデータ編集
         make_HK(dst);
@@ -51,22 +54,14 @@ _Noreturn void drill_loop(DRILL_STATUS *dst) {
         //UARTにデータ転送
         memcpy(txBuf, dst->flm.buf, N_FLAME);
         HAL_UART_Transmit_DMA(&huart2, txBuf, N_FLAME);
-#if 1
-        //初回or時刻の切れ目でファイルオープン
-        if ((dst->TI % FILE_RENEW_SEC) == 0) {
-            //初回でなければクローズ
-            if (dst->TI != 0) {
-                F_STAT = mod20_close(&hi2c1) ? F_STAT | ST_SD_CLOSE : F_STAT & ~ST_SD_CLOSE;
-            }
-            //オープン
-            F_STAT = mod20_open(&hi2c1, nf) ? F_STAT | ST_SD_OPEN : F_STAT & ~ST_SD_OPEN;
-        }
 
         //データをSDカードに出力する。
         F_STAT = mod20_write80byte(&hi2c1, txBuf) ? F_STAT | ST_SD_WRITE : F_STAT & ~ST_SD_WRITE;
-#endif
+
+        //後始末
         dst->TI ++;
-        nf = nf != 99999 ? 0: nf+1;
+        nf = (nf == FILE_ROLLUP-1) ? 0: nf+1;
+        HAL_GPIO_WritePin(CPU_MON_GPIO_Port, CPU_MON_Pin, 0);
     }
 }
 
