@@ -110,6 +110,7 @@ int8_t BME280_i2c_write(uint8_t id, uint8_t reg_addr, uint8_t *data, uint16_t le
   */
 int main(void)
 {
+
   /* USER CODE BEGIN 1 */
   /* USER CODE END 1 */
 

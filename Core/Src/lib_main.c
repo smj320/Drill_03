@@ -168,7 +168,7 @@ void make_HK(DRILL_STATUS *dst) {
         dst->flm.elm.SYS_T = comp_data.temperature / 100.0;
         dst->flm.elm.SYS_H = comp_data.humidity / 1024.0;
         double atm = ((double) comp_data.pressure / 10000.0) / 1024.0;
-        dst->flm.elm.SYS_P = (u_int8_t) (round(atm));
+        dst->flm.elm.SYS_P = (uint8_t) (round(atm));
     }
 #endif
 
