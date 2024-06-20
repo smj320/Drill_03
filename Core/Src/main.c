@@ -159,7 +159,7 @@ int main(void)
     bme_dev.settings.osr_p = BME280_OVERSAMPLING_16X;
     bme_dev.settings.osr_t = BME280_OVERSAMPLING_2X;
     bme_dev.settings.filter = BME280_FILTER_COEFF_16;
-    result = bme280_set_sensor_settings(
+    bme280_set_sensor_settings(
             BME280_OSR_PRESS_SEL | BME280_OSR_TEMP_SEL | BME280_OSR_HUM_SEL | BME280_FILTER_SEL, &bme_dev);
     //bme280_dump(&bme_dev, &comp_data);
 #endif

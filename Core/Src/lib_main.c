@@ -40,11 +40,9 @@ _Noreturn void drill_loop(DRILL_STATUS *dst) {
 
     //ファイルオープン,reopenでタイムアウトになるので基本閉じない
     //初期化が失敗しているときは処理をスキップする。
-    if(F_STAT & ST_SD_INIT)
-    {
+    if (F_STAT & ST_SD_INIT) {
         F_STAT |= ST_SD_OPEN;
-    }
-    else{
+    } else {
         F_STAT = mod20_open(&hi2c1, nf) ? F_STAT | ST_SD_OPEN : F_STAT & ~ST_SD_OPEN;
     }
 
@@ -63,13 +61,13 @@ _Noreturn void drill_loop(DRILL_STATUS *dst) {
         HAL_UART_Transmit_DMA(&huart2, txBuf, N_FLAME);
 
         //ST_SD_OPENが0のときデータをSDカードに出力する。
-        if(!(F_STAT & ST_SD_OPEN)){
+        if (!(F_STAT & ST_SD_OPEN)) {
             F_STAT = mod20_write80byte(&hi2c1, txBuf) ? F_STAT | ST_SD_WRITE : F_STAT & ~ST_SD_WRITE;
         }
 
         //後始末
-        dst->TI ++;
-        nf = (nf == FILE_ROLLUP-1) ? 0: nf+1;
+        dst->TI++;
+        nf = (nf == FILE_ROLLUP - 1) ? 0 : nf + 1;
         HAL_GPIO_WritePin(CPU_MON_GPIO_Port, CPU_MON_Pin, 0);
     }
 }
@@ -114,10 +112,11 @@ void check_GPIO() {
  * @param isFirst
  * @param hk_data
  */
+static int16_t cc=-127*64;
 void make_HK(DRILL_STATUS *dst) {
 
     uint8_t sum, i;
-    static uint16_t data;
+    static int16_t data;
     bno055_vector_t v;
     int16_t mag_xyz[3];
     static double absG, grav0[3] = {0.0, 0.0, 0.0};
@@ -236,34 +235,40 @@ void make_HK(DRILL_STATUS *dst) {
     MCP3424_Ask(MCP3424_PT100_ADDR, BAT_T_CH);
     MCP3424_Ask(MCP3424_LVDT_ADDR, GND_P_CH);
     HAL_Delay(70);
-    if (MCP3424_Ans(MCP3424_HV_ADDR, &data) == 0) dst->flm.elm.MOT_V = (int8_t)(data / 64);
-    if (MCP3424_Ans(MCP3424_PT100_ADDR, &data) == 0) dst->flm.elm.BAT_T = (int8_t)(data / 64);
+    if (MCP3424_Ans(MCP3424_HV_ADDR, &data) == 0) dst->flm.elm.MOT_V = (int8_t) (data>>8);
+    if (MCP3424_Ans(MCP3424_PT100_ADDR, &data) == 0) dst->flm.elm.BAT_T = (int8_t) (data >>8 );
     if (MCP3424_Ans(MCP3424_LVDT_ADDR, &data) == 0) dst->flm.elm.GND_P = data;
     //
     MCP3424_Ask(MCP3424_HV_ADDR, MOT_I_CH);
     MCP3424_Ask(MCP3424_PT100_ADDR, LIQ2_T_CH);
     MCP3424_Ask(MCP3424_LVDT_ADDR, BAT_V_CH);
     HAL_Delay(70);
-    if (MCP3424_Ans(MCP3424_HV_ADDR, &data) == 0) dst->flm.elm.MOT_I = (int8_t)(data / 64);
+    if (MCP3424_Ans(MCP3424_HV_ADDR, &data) == 0) dst->flm.elm.MOT_I = (int8_t) (data >>8);
     if (MCP3424_Ans(MCP3424_PT100_ADDR, &data) == 0) dst->flm.elm.LIQ2_T = data;
-    if (MCP3424_Ans(MCP3424_LVDT_ADDR, &data) == 0) dst->flm.elm.BAT_V = (int8_t)(data / 64);
+    if (MCP3424_Ans(MCP3424_LVDT_ADDR, &data) == 0) dst->flm.elm.BAT_V = (int8_t) (data >>8);
     //
     MCP3424_Ask(MCP3424_HV_ADDR, MOT_R_CH);
     MCP3424_Ask(MCP3424_PT100_ADDR, MOT_T_CH);
     MCP3424_Ask(MCP3424_LVDT_ADDR, LIQ1_P_CH);
     HAL_Delay(70);
-    if (MCP3424_Ans(MCP3424_HV_ADDR, &data) == 0) dst->flm.elm.MOT_R = (int8_t)(data / 64);
-    if (MCP3424_Ans(MCP3424_PT100_ADDR, &data) == 0) dst->flm.elm.MOT_T = (int8_t)(data / 64);
+    if (MCP3424_Ans(MCP3424_HV_ADDR, &data) == 0) dst->flm.elm.MOT_R = (int8_t) (data >>8);
+    if (MCP3424_Ans(MCP3424_PT100_ADDR, &data) == 0) dst->flm.elm.MOT_T = (int8_t) (data >>8);
     if (MCP3424_Ans(MCP3424_LVDT_ADDR, &data) == 0) dst->flm.elm.LIQ1_P = data;
     //
     MCP3424_Ask(MCP3424_HV_ADDR, PDU_V_CH);
     MCP3424_Ask(MCP3424_PT100_ADDR, GEA_T_CH);
     MCP3424_Ask(MCP3424_LVDT_ADDR, LIQ1_T_CH);
     HAL_Delay(70);
-    if (MCP3424_Ans(MCP3424_HV_ADDR, &data) == 0) dst->flm.elm.PDU_V = (int8_t)(data / 64);
-    if (MCP3424_Ans(MCP3424_PT100_ADDR, &data) == 0) dst->flm.elm.GEA_T = (int8_t)(data / 64);
+    if (MCP3424_Ans(MCP3424_HV_ADDR, &data) == 0) dst->flm.elm.PDU_V = (int8_t) (data >>8);
+    if (MCP3424_Ans(MCP3424_PT100_ADDR, &data) == 0) dst->flm.elm.GEA_T = (int8_t) (data >>8);
     if (MCP3424_Ans(MCP3424_LVDT_ADDR, &data) == 0) dst->flm.elm.LIQ1_T = data;
 #endif
+    /*
+    data = cc;
+    dst->flm.elm.MOT_R = (int8_t)(data/64);
+    cc = cc + 64;
+    if(128*64 < cc) cc=-127*64;
+     */
 
     //チェックサム生成
     for (i = 1, sum = dst->flm.buf[0]; i <= N_FLAME - 2; i++) {
