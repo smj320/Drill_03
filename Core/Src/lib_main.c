@@ -112,7 +112,8 @@ void check_GPIO() {
  * @param isFirst
  * @param hk_data
  */
-static int16_t cc=-127*64;
+static int16_t cc = -127 * 64;
+
 void make_HK(DRILL_STATUS *dst) {
 
     uint8_t sum, i;
@@ -239,33 +240,41 @@ void make_HK(DRILL_STATUS *dst) {
     MCP3424_Ask(MCP3424_HV_ADDR, MOT_V_CH);
     MCP3424_Ask(MCP3424_PT100_ADDR, BAT_T_CH);
     MCP3424_Ask(MCP3424_LVDT1_ADDR, GND_P_CH);
+    MCP3424_Ask(MCP3424_LVDT2_ADDR, BOA1_D_CH);
+    MCP3424_Ask(MCP3424_LVDT3_ADDR, BOA2_D_CH);
     HAL_Delay(70);
-    if (MCP3424_Ans(MCP3424_HV_ADDR, &data) == 0) dst->flm.elm.MOT_V = (int8_t) (data>>8);
-    if (MCP3424_Ans(MCP3424_PT100_ADDR, &data) == 0) dst->flm.elm.BAT_T = (int8_t) (data >>8 );
+    if (MCP3424_Ans(MCP3424_HV_ADDR, &data) == 0) dst->flm.elm.MOT_V = (int8_t) (data >> 8);
+    if (MCP3424_Ans(MCP3424_PT100_ADDR, &data) == 0) dst->flm.elm.BAT_T = (int8_t) (data >> 8);
     if (MCP3424_Ans(MCP3424_LVDT1_ADDR, &data) == 0) dst->flm.elm.GND_P = data;
+    if (MCP3424_Ans(MCP3424_LVDT2_ADDR, &data) == 0) dst->flm.elm.BOA1_D = data;
+    if (MCP3424_Ans(MCP3424_LVDT3_ADDR, &data) == 0) dst->flm.elm.BOA2_D = data;
     //
     MCP3424_Ask(MCP3424_HV_ADDR, MOT_I_CH);
     MCP3424_Ask(MCP3424_PT100_ADDR, LIQ2_T_CH);
     MCP3424_Ask(MCP3424_LVDT1_ADDR, BAT_V_CH);
+    MCP3424_Ask(MCP3424_LVDT2_ADDR, LIQ3_T_CH);
+    MCP3424_Ask(MCP3424_LVDT3_ADDR, LIQ4_T_CH);
     HAL_Delay(70);
-    if (MCP3424_Ans(MCP3424_HV_ADDR, &data) == 0) dst->flm.elm.MOT_I = (int8_t) (data >>8);
+    if (MCP3424_Ans(MCP3424_HV_ADDR, &data) == 0) dst->flm.elm.MOT_I = (int8_t) (data >> 8);
     if (MCP3424_Ans(MCP3424_PT100_ADDR, &data) == 0) dst->flm.elm.LIQ2_T = data;
-    if (MCP3424_Ans(MCP3424_LVDT1_ADDR, &data) == 0) dst->flm.elm.BAT_V = (int8_t) (data >>8);
+    if (MCP3424_Ans(MCP3424_LVDT1_ADDR, &data) == 0) dst->flm.elm.BAT_V = (int8_t) (data >> 8);
+    if (MCP3424_Ans(MCP3424_LVDT2_ADDR, &data) == 0) dst->flm.elm.LIQ3_T = data;
+    if (MCP3424_Ans(MCP3424_LVDT3_ADDR, &data) == 0) dst->flm.elm.LIQ4_T = data;
     //
     MCP3424_Ask(MCP3424_HV_ADDR, MOT_R_CH);
     MCP3424_Ask(MCP3424_PT100_ADDR, MOT_T_CH);
     MCP3424_Ask(MCP3424_LVDT1_ADDR, LIQ1_P_CH);
     HAL_Delay(70);
-    if (MCP3424_Ans(MCP3424_HV_ADDR, &data) == 0) dst->flm.elm.MOT_R = (int8_t) (data >>8);
-    if (MCP3424_Ans(MCP3424_PT100_ADDR, &data) == 0) dst->flm.elm.MOT_T = (int8_t) (data >>8);
+    if (MCP3424_Ans(MCP3424_HV_ADDR, &data) == 0) dst->flm.elm.MOT_R = (int8_t) (data >> 8);
+    if (MCP3424_Ans(MCP3424_PT100_ADDR, &data) == 0) dst->flm.elm.MOT_T = (int8_t) (data >> 8);
     if (MCP3424_Ans(MCP3424_LVDT1_ADDR, &data) == 0) dst->flm.elm.LIQ1_P = data;
     //
     MCP3424_Ask(MCP3424_HV_ADDR, PDU_V_CH);
     MCP3424_Ask(MCP3424_PT100_ADDR, GEA_T_CH);
     MCP3424_Ask(MCP3424_LVDT1_ADDR, LIQ1_T_CH);
     HAL_Delay(70);
-    if (MCP3424_Ans(MCP3424_HV_ADDR, &data) == 0) dst->flm.elm.PDU_V = (int8_t) (data >>8);
-    if (MCP3424_Ans(MCP3424_PT100_ADDR, &data) == 0) dst->flm.elm.GEA_T = (int8_t) (data >>8);
+    if (MCP3424_Ans(MCP3424_HV_ADDR, &data) == 0) dst->flm.elm.PDU_V = (int8_t) (data >> 8);
+    if (MCP3424_Ans(MCP3424_PT100_ADDR, &data) == 0) dst->flm.elm.GEA_T = (int8_t) (data >> 8);
     if (MCP3424_Ans(MCP3424_LVDT1_ADDR, &data) == 0) dst->flm.elm.LIQ1_T = data;
 #endif
     /*
