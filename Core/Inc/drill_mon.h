@@ -114,10 +114,10 @@ _Noreturn void drill_loop(DRILL_STATUS *dst);
 #define LIQ2_T_CH 1
 #define MOT_T_CH 2
 #define GEA_T_CH 3
-#define MCP3424_LVDT2_ADDR 0x66  //d0=1,ad1=1
+#define MCP3424_LVDT2_ADDR 0x6E  //d0=1,ad1=1
 #define BOA1_D_CH 0
 #define LIQ3_T_CH 3
-#define MCP3424_LVDT3_ADDR 0x61  //d0=0,ad1=F
+#define MCP3424_LVDT3_ADDR 0x69  //d0=0,ad1=F
 #define BOA2_D_CH 0
 #define LIQ4_T_CH 3
 
