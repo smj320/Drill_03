@@ -38,7 +38,7 @@ union tlm_flame {
         int16_t LIQ1_T; //24
         int16_t LIQ1_P; //26
         int16_t LIQ2_T; //28
-        int16_t BOA_D;  //30
+        int16_t BOA1_D;  //30
         int16_t GRA_X;  //32
         int16_t GRA_Y;  //34
         int16_t GRA_Z;  //36
@@ -51,7 +51,10 @@ union tlm_flame {
         int16_t MAG_X;  //50
         int16_t MAG_Y;  //52
         int16_t MAG_Z;  //54
-        uint16_t PAD;   //56
+        int16_t BOA2_D; //56
+        int16_t LIQ3_T; //58
+        int16_t LIQ4_T; //60
+        uint16_t PAD;   //62
         uint16_t SUM;   //80
     } elm;
 };
@@ -101,15 +104,21 @@ _Noreturn void drill_loop(DRILL_STATUS *dst);
 #define MOT_V_CH 1
 #define MOT_R_CH 2
 #define PDU_V_CH 3
+#define MCP3424_LVDT1_ADDR 0x6A  //d0=0,ad1=1
+#define GND_P_CH 0
+#define BAT_V_CH 1
+#define LIQ1_P_CH 2
+#define LIQ1_T_CH 3
 #define MCP3424_PT100_ADDR 0x6C //d0=1,ad1=0
 #define BAT_T_CH 0
 #define LIQ2_T_CH 1
 #define MOT_T_CH 2
 #define GEA_T_CH 3
-#define MCP3424_LVDT_ADDR 0x6A  //d0=0,ad1=1
-#define GND_P_CH 0
-#define BAT_V_CH 1
-#define LIQ1_P_CH 2
-#define LIQ1_T_CH 3
+#define MCP3424_LVDT2_ADDR 0x66  //d0=1,ad1=1
+#define BOA1_D_CH 0
+#define LIQ3_T_CH 3
+#define MCP3424_LVDT3_ADDR 0x61  //d0=0,ad1=F
+#define BOA1_2_CH 0
+#define LIQ4_T_CH 1
 
 #endif //DRILL03_DRILL_MON_H

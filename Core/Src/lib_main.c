@@ -154,7 +154,7 @@ void make_HK(DRILL_STATUS *dst) {
     dst->flm.elm.LIQ1_T = 17;
     dst->flm.elm.LIQ1_P = 18;
     dst->flm.elm.LIQ2_T = 19;
-    dst->flm.elm.BOA_D = 20;
+    dst->flm.elm.BOA1_D = 20;
     dst->flm.elm.GRA_X = 21;
     dst->flm.elm.GRA_Y = 22;
     dst->flm.elm.GRA_Z = 23;
@@ -167,6 +167,9 @@ void make_HK(DRILL_STATUS *dst) {
     dst->flm.elm.MAG_X = 30;
     dst->flm.elm.MAG_Y = 31;
     dst->flm.elm.MAG_Z = 32;
+    dst->flm.elm.BOA2_D = 30;
+    dst->flm.elm.LIQ3_T = 31;
+    dst->flm.elm.LIQ4_T = 32;
 
 #if 1
     //気温・湿度・圧力
@@ -227,41 +230,43 @@ void make_HK(DRILL_STATUS *dst) {
 #endif
 
 #if 1
-    //MCP3424 MCP3424_HV_ADDR, ad0=0,ad1=0
-    //MCP3424 MCP3424_PT100_ADDR, ad0=1,ad1=0
-    //MCP3424 MCP3424_PT100_ADDR, d0=0,ad1=1
+    //MCP3424 MCP3424_HV_ADDR, ad0=0,ad1=0 0x68
+    //MCP3424 MCP3424_LVDT1_ADDR, ad0=1,ad1=0 0x6C
+    //MCP3424 MCP3424_PT100_ADDR, d0=0,ad1=1 0x6A
+    //MCP3424 MCP3424_LVDT2_ADDR, ad0=1,ad1=1 0x66
+    //MCP3424 MCP3424_LVDT3_ADDR, ad0=0,ad1=open 0x61
     //変換時間に66msかかるので、ICごとに指令をずらして出す
     MCP3424_Ask(MCP3424_HV_ADDR, MOT_V_CH);
     MCP3424_Ask(MCP3424_PT100_ADDR, BAT_T_CH);
-    MCP3424_Ask(MCP3424_LVDT_ADDR, GND_P_CH);
+    MCP3424_Ask(MCP3424_LVDT1_ADDR, GND_P_CH);
     HAL_Delay(70);
     if (MCP3424_Ans(MCP3424_HV_ADDR, &data) == 0) dst->flm.elm.MOT_V = (int8_t) (data>>8);
     if (MCP3424_Ans(MCP3424_PT100_ADDR, &data) == 0) dst->flm.elm.BAT_T = (int8_t) (data >>8 );
-    if (MCP3424_Ans(MCP3424_LVDT_ADDR, &data) == 0) dst->flm.elm.GND_P = data;
+    if (MCP3424_Ans(MCP3424_LVDT1_ADDR, &data) == 0) dst->flm.elm.GND_P = data;
     //
     MCP3424_Ask(MCP3424_HV_ADDR, MOT_I_CH);
     MCP3424_Ask(MCP3424_PT100_ADDR, LIQ2_T_CH);
-    MCP3424_Ask(MCP3424_LVDT_ADDR, BAT_V_CH);
+    MCP3424_Ask(MCP3424_LVDT1_ADDR, BAT_V_CH);
     HAL_Delay(70);
     if (MCP3424_Ans(MCP3424_HV_ADDR, &data) == 0) dst->flm.elm.MOT_I = (int8_t) (data >>8);
     if (MCP3424_Ans(MCP3424_PT100_ADDR, &data) == 0) dst->flm.elm.LIQ2_T = data;
-    if (MCP3424_Ans(MCP3424_LVDT_ADDR, &data) == 0) dst->flm.elm.BAT_V = (int8_t) (data >>8);
+    if (MCP3424_Ans(MCP3424_LVDT1_ADDR, &data) == 0) dst->flm.elm.BAT_V = (int8_t) (data >>8);
     //
     MCP3424_Ask(MCP3424_HV_ADDR, MOT_R_CH);
     MCP3424_Ask(MCP3424_PT100_ADDR, MOT_T_CH);
-    MCP3424_Ask(MCP3424_LVDT_ADDR, LIQ1_P_CH);
+    MCP3424_Ask(MCP3424_LVDT1_ADDR, LIQ1_P_CH);
     HAL_Delay(70);
     if (MCP3424_Ans(MCP3424_HV_ADDR, &data) == 0) dst->flm.elm.MOT_R = (int8_t) (data >>8);
     if (MCP3424_Ans(MCP3424_PT100_ADDR, &data) == 0) dst->flm.elm.MOT_T = (int8_t) (data >>8);
-    if (MCP3424_Ans(MCP3424_LVDT_ADDR, &data) == 0) dst->flm.elm.LIQ1_P = data;
+    if (MCP3424_Ans(MCP3424_LVDT1_ADDR, &data) == 0) dst->flm.elm.LIQ1_P = data;
     //
     MCP3424_Ask(MCP3424_HV_ADDR, PDU_V_CH);
     MCP3424_Ask(MCP3424_PT100_ADDR, GEA_T_CH);
-    MCP3424_Ask(MCP3424_LVDT_ADDR, LIQ1_T_CH);
+    MCP3424_Ask(MCP3424_LVDT1_ADDR, LIQ1_T_CH);
     HAL_Delay(70);
     if (MCP3424_Ans(MCP3424_HV_ADDR, &data) == 0) dst->flm.elm.PDU_V = (int8_t) (data >>8);
     if (MCP3424_Ans(MCP3424_PT100_ADDR, &data) == 0) dst->flm.elm.GEA_T = (int8_t) (data >>8);
-    if (MCP3424_Ans(MCP3424_LVDT_ADDR, &data) == 0) dst->flm.elm.LIQ1_T = data;
+    if (MCP3424_Ans(MCP3424_LVDT1_ADDR, &data) == 0) dst->flm.elm.LIQ1_T = data;
 #endif
     /*
     data = cc;
