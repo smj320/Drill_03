@@ -48,8 +48,7 @@ else ()
     add_compile_options(-Og -g)
 endif ()
 
-set(base_inc "/usr/local/Cellar/arm-none-eabi-gcc/10.3-2021.10/gcc/lib/gcc/arm-none-eabi/10.3.1/include")
-include_directories(${base_inc} ${includes})
+include_directories(${includes})
 
 add_definitions(${defines})
 
