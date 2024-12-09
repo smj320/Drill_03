@@ -165,7 +165,7 @@ int main(void)
 #endif
 
 #if 1
-    //acc
+    //BNO055
     bno055_assignI2C(&hi2c1);
     bno055_setup();
     bno055_setOperationModeNDOF();
@@ -177,10 +177,11 @@ int main(void)
     //MCP3424_dump(MCP3424_PT100_ADDR);
     //MCP3424_dump(MCP3424_LVDT_ADDR);
 
+#if 1
     //SD
     result = mod20_Init(&hi2c1);
     if(result !=0) F_STAT |= ST_SD_INIT;
-
+#endif
     //タイマスタート
     HAL_TIM_Base_Start_IT(&htim6);
   /* USER CODE END 2 */
@@ -255,7 +256,7 @@ static void MX_I2C1_Init(void)
 
   /* USER CODE END I2C1_Init 1 */
   hi2c1.Instance = I2C1;
-  hi2c1.Init.Timing = 0x00103EFB;
+  hi2c1.Init.Timing = 0x00201CFE;
   hi2c1.Init.OwnAddress1 = 0;
   hi2c1.Init.AddressingMode = I2C_ADDRESSINGMODE_7BIT;
   hi2c1.Init.DualAddressMode = I2C_DUALADDRESS_DISABLE;
@@ -277,7 +278,7 @@ static void MX_I2C1_Init(void)
 
   /** Configure Digital filter
   */
-  if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 0) != HAL_OK)
+  if (HAL_I2CEx_ConfigDigitalFilter(&hi2c1, 15) != HAL_OK)
   {
     Error_Handler();
   }

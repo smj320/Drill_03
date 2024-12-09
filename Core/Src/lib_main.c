@@ -299,19 +299,19 @@ void Lib_dump_3f(int type, float x, float y, float z) {
     char fmt[32];
     switch (type) {
         case DTP_MAG:
-            strcpy(fmt, "mag x:%f y:%f z:%f\r\n");
+            strcpy(fmt, "mag(xyz), %8.3f, %8.3f, %8.3f\r\n");
             break;
         case DTP_GRA:
-            strcpy(fmt, "grav x:%f y:%f z:%f\r\n");
+            strcpy(fmt, "grv(xyz), %8.3f, %8.3f, %8.3f\r\n");
             break;
         case DTP_GAY:
-            strcpy(fmt, "gyro x:%f y:%f z:%f\r\n");
+            strcpy(fmt, "gyr(xyz), %8.3f, %8.3f, %8.3f\r\n");
             break;
         case DTP_ACC:
-            strcpy(fmt, "acc x:%f y:%f z:%f\r\n");
+            strcpy(fmt, "acc(xyz), %8.3f, %8.3f, %8.3f\r\n");
             break;
         case DTP_HUM:
-            strcpy(fmt, "tmp  t:%f hum:%f atm:%f\r\n");
+            strcpy(fmt, "tmp(TAH),  %8.3f, %8.3f, %8.3f\r\n");
             break;
         default:
             strcpy(fmt, "error\r\n");
