@@ -26,7 +26,17 @@ int MCP3424_Read(uint8_t addr, uint8_t ch, uint16_t *data) {
     return 0;
 }
 */
-
+/**
+ * 符号つき16bitサンプリング
+ * b10011000 => start(1),
+ * channel(01),
+ * on_shot(1),
+ * 16bit_15SPS(10),
+ * gain(00)
+ * @param addr
+ * @param ch
+ * @return
+ */
 int MCP3424_Ask(uint8_t addr, uint8_t ch) {
     HAL_StatusTypeDef s;
     uint8_t cmd[4] = {0b10011000, 0b10111000, 0b11011000, 0b11111000};
