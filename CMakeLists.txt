@@ -1,7 +1,7 @@
-#このファイルはテンプレートから自動生成されています！変更しないでください！
-set(CMAKE_SYSTEM_NAME Generic)
+#THIS FILE IS AUTO GENERATED FROM THE TEMPLATE! DO NOT CHANGE!
 set(CMAKE_SYSTEM_VERSION 1)
-cmake_minimum_required(VERSION 3.30)
+cmake_minimum_required(VERSION 3.31)
+
 
 # specify cross-compilers and tools
 set(CMAKE_C_COMPILER arm-none-eabi-gcc)
@@ -27,7 +27,8 @@ add_link_options(-mfloat-abi=hard -mfpu=fpv4-sp-d16)
 #add_compile_options(-mfloat-abi=soft)
 
 add_compile_options(-mcpu=cortex-m4 -mthumb -mthumb-interwork)
-add_compile_options(-ffunction-sections -fdata-sections -fcommon -fmessage-length=0)
+# add_compile_options(-ffunction-sections -fdata-sections -fcommon -fmessage-length=0)
+add_compile_options(-ffunction-sections -fdata-sections -fmessage-length=0)
 
 # uncomment to mitigate c++17 absolute addresses warnings
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-register")
