@@ -27,7 +27,6 @@ add_link_options(-mfloat-abi=hard -mfpu=fpv4-sp-d16)
 #add_compile_options(-mfloat-abi=soft)
 
 add_compile_options(-mcpu=cortex-m4 -mthumb -mthumb-interwork)
-# add_compile_options(-ffunction-sections -fdata-sections -fcommon -fmessage-length=0)
 add_compile_options(-ffunction-sections -fdata-sections -fmessage-length=0)
 
 # uncomment to mitigate c++17 absolute addresses warnings

@@ -11,6 +11,7 @@
 #include "bno055.h"
 #include "bm1422.h"
 #include "mod20.h"
+#include "cputemp.h"
 #include <stdio.h>
 #include <math.h>
 
@@ -171,6 +172,8 @@ void make_HK(DRILL_STATUS *dst) {
     dst->flm.elm.BOA2_D = 30;
     dst->flm.elm.LIQ3_T = 31;
     dst->flm.elm.LIQ4_T = 32;
+    dst->flm.elm.SYS_T2 = 33;
+    dst->flm.elm.SYS_P2 = 34;
 
 #if 1
     //気温・湿度・圧力
@@ -228,6 +231,12 @@ void make_HK(DRILL_STATUS *dst) {
 
     //ここまで80ms
     //HAL_GPIO_WritePin(CPU_MON_GPIO_Port, CPU_MON_Pin, GPIO_PIN_RESET);
+#endif
+
+#if 1
+    // CPU Temp
+    float current_temp = GetInternalTemperature();
+    dst->flm.elm.SYS_T2 = (int16_t)(current_temp*100);
 #endif
 
 #if 1

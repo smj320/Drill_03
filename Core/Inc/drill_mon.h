@@ -54,7 +54,9 @@ union tlm_flame {
         int16_t BOA2_D; //56
         int16_t LIQ3_T; //58
         int16_t LIQ4_T; //60
-        uint16_t PAD;   //62
+        int16_t SYS_T2; //62
+        int16_t SYS_P2; //64
+        uint16_t PAD;   //66
         uint16_t SUM;   //80
     } elm;
 };
