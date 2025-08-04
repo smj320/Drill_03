@@ -234,12 +234,6 @@ void make_HK(DRILL_STATUS *dst) {
 #endif
 
 #if 1
-    // CPU Temp
-    float current_temp = GetInternalTemperature();
-    dst->flm.elm.SYS_T2 = (int16_t)(current_temp*100);
-#endif
-
-#if 1
     //MCP3424 MCP3424_HV_ADDR, ad0=0,ad1=0 0x68
     //MCP3424 MCP3424_LVDT1_ADDR, ad0=1,ad1=0 0x6C
     //MCP3424 MCP3424_PT100_ADDR, d0=0,ad1=1 0x6A
@@ -264,7 +258,10 @@ void make_HK(DRILL_STATUS *dst) {
     MCP3424_Ask(MCP3424_LVDT2_ADDR, LIQ3_T_CH);
     MCP3424_Ask(MCP3424_LVDT3_ADDR, LIQ4_T_CH);
     HAL_Delay(70);
-    if (MCP3424_Ans(MCP3424_HV_ADDR, &data) == 0) dst->flm.elm.MOT_I = (int8_t) (data >> 8);
+    if (MCP3424_Ans(MCP3424_HV_ADDR, &data) == 0) {
+        dst->flm.elm.MOT_I = (int8_t) (data >> 8);
+        dst->flm.elm.SYS_P2 = data;
+    }
     if (MCP3424_Ans(MCP3424_PT100_ADDR, &data) == 0) dst->flm.elm.LIQ2_T = data;
     if (MCP3424_Ans(MCP3424_LVDT1_ADDR, &data) == 0) dst->flm.elm.BAT_V = (int8_t) (data >> 8);
     if (MCP3424_Ans(MCP3424_LVDT2_ADDR, &data) == 0) dst->flm.elm.LIQ3_T = data;
@@ -292,6 +289,12 @@ void make_HK(DRILL_STATUS *dst) {
     cc = cc + 64;
     if(128*64 < cc) cc=-127*64;
      */
+
+#if 1
+    // CPU Temp / SYS_P2
+    float current_temp = GetInternalTemperature();
+    dst->flm.elm.SYS_T2 = (int16_t)(current_temp*100);
+#endif
 
     //チェックサム生成
     for (i = 1, sum = dst->flm.buf[0]; i <= N_FLAME - 2; i++) {
