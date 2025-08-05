@@ -135,8 +135,9 @@ void make_HK(DRILL_STATUS *dst) {
     //フレームカウンタ
     dst->flm.elm.TI = dst->TI;
 
-    //ファイル状態
-    dst->flm.elm.STAT = F_STAT;
+    //システム状態
+    int8_t is_butyl = HAL_GPIO_ReadPin(BUTYL_GPIO_Port, BUTYL_Pin);
+    dst->flm.elm.STAT = F_STAT+(is_butyl << 2);
 
     //位置指定
     dst->flm.elm.PDU_V = 3;
