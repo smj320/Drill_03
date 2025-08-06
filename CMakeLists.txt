@@ -1,6 +1,6 @@
 #このファイルはテンプレートから自動生成されています！変更しないでください！
 set(CMAKE_SYSTEM_VERSION 1)
-cmake_minimum_required(VERSION 3.31)
+cmake_minimum_required(VERSION 3.30)
 
 
 # specify cross-compilers and tools

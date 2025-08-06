@@ -137,7 +137,7 @@ void make_HK(DRILL_STATUS *dst) {
 
     //システム状態
     int8_t is_butyl = HAL_GPIO_ReadPin(BUTYL_GPIO_Port, BUTYL_Pin);
-    dst->flm.elm.STAT = F_STAT+(((~is_butyl)&0x01) << 2);
+    dst->flm.elm.STAT = F_STAT+(((~is_butyl)&0x01) << 4);
 
     //位置指定
     dst->flm.elm.PDU_V = 3;
