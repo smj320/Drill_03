@@ -137,7 +137,7 @@ void make_HK(DRILL_STATUS *dst) {
 
     //システム状態
     int8_t is_butyl = HAL_GPIO_ReadPin(BUTYL_GPIO_Port, BUTYL_Pin);
-    dst->flm.elm.STAT = F_STAT+(is_butyl << 2);
+    dst->flm.elm.STAT = F_STAT+(((~is_butyl)&0x01) << 2);
 
     //位置指定
     dst->flm.elm.PDU_V = 3;
@@ -253,7 +253,7 @@ void make_HK(DRILL_STATUS *dst) {
     if (MCP3424_Ans(MCP3424_LVDT2_ADDR, &data) == 0) dst->flm.elm.BOA1_D = data;
     if (MCP3424_Ans(MCP3424_LVDT3_ADDR, &data) == 0) dst->flm.elm.BOA2_D = data;
     //
-    MCP3424_Ask(MCP3424_HV_ADDR, MOT_I_CH);
+    MCP3424_Ask(MCP3424_HV_ADDR, SYS_P2_CH);
     MCP3424_Ask(MCP3424_PT100_ADDR, LIQ2_T_CH);
     MCP3424_Ask(MCP3424_LVDT1_ADDR, BAT_V_CH);
     MCP3424_Ask(MCP3424_LVDT2_ADDR, LIQ3_T_CH);

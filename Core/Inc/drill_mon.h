@@ -102,7 +102,7 @@ _Noreturn void drill_loop(DRILL_STATUS *dst);
 
 //各種デバイス定数,chは0base
 #define MCP3424_HV_ADDR 0x68 //ad0=0,ad1=0
-#define MOT_I_CH 0
+#define SYS_P2_CH 0
 #define MOT_V_CH 1
 #define MOT_R_CH 2
 #define PDU_V_CH 3
