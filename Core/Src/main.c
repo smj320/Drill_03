@@ -62,7 +62,8 @@ DRILL_STATUS Dst;
 //bme280
 struct bme280_dev bme_dev;
 struct bme280_data comp_data;
-uint8_t F_STAT=0;
+//20260805 ファイル処理削除
+//uint8_t F_STAT=0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -183,8 +184,9 @@ int main(void)
 
 #if 1
     //SD
-    result = mod20_Init(&hi2c1);
-    if(result !=0) F_STAT |= ST_SD_INIT;
+    //20260805 ファイル処理削除
+    // result = mod20_Init(&hi2c1);
+    // if(result !=0) F_STAT |= ST_SD_INIT;
 #endif
     //タイマスタート
     HAL_TIM_Base_Start_IT(&htim6);

@@ -22,7 +22,8 @@ extern I2C_HandleTypeDef hi2c1;
 extern UART_HandleTypeDef huart2;
 extern struct bme280_dev bme_dev;
 extern struct bme280_data comp_data;
-extern uint8_t F_STAT;
+//20260805 ファイル処理削除
+//extern uint8_t F_STAT;
 
 /**
  * 後ろにあるやつ
@@ -41,11 +42,14 @@ _Noreturn void drill_loop(DRILL_STATUS *dst) {
 
     //ファイルオープン,reopenでタイムアウトになるので基本閉じない
     //初期化が失敗しているときは処理をスキップする。
+    //20260805 ファイル処理削除
+    /*
     if (F_STAT & ST_SD_INIT) {
         F_STAT |= ST_SD_OPEN;
     } else {
         F_STAT = mod20_open(&hi2c1, nf) ? F_STAT | ST_SD_OPEN : F_STAT & ~ST_SD_OPEN;
     }
+    */
 
     //メインループ
     while (1) {
@@ -62,9 +66,12 @@ _Noreturn void drill_loop(DRILL_STATUS *dst) {
         HAL_UART_Transmit_DMA(&huart2, txBuf, N_FLAME);
 
         //ST_SD_OPENが0のときデータをSDカードに出力する。
+        //20260805 ファイル処理削除
+        /*
         if (!(F_STAT & ST_SD_OPEN)) {
             F_STAT = mod20_write80byte(&hi2c1, txBuf) ? F_STAT | ST_SD_WRITE : F_STAT & ~ST_SD_WRITE;
         }
+        */
 
         //後始末
         dst->TI++;
@@ -137,7 +144,8 @@ void make_HK(DRILL_STATUS *dst) {
 
     //システム状態
     int8_t is_butyl = HAL_GPIO_ReadPin(BUTYL_GPIO_Port, BUTYL_Pin);
-    dst->flm.elm.STAT = F_STAT+(((~is_butyl)&0x01) << 2);
+    dst->flm.elm.STAT = 0;
+    //dst->flm.elm.STAT = F_STAT+(((~is_butyl)&0x01) << 2);
 
     //位置指定
     dst->flm.elm.PDU_V = 3;

@@ -73,8 +73,8 @@ typedef struct {
     uint32_t TI;            //フレームカウンタ
     uint8_t isFirst;        //初回動作か
     uint8_t F_PPS;          //1PPSの通知
-    union tlm_flame flm;   //転送用バッファ
-    uint8_t f_stat;         //ファイルステータスビット
+    union tlm_flame flm;    //転送用バッファ
+    uint8_t f_stat;         //テータスフラグビット
 } DRILL_STATUS;
 
 /**
