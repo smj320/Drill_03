@@ -314,6 +314,13 @@ static void MX_ADC1_Init(void)
   }
   /* USER CODE BEGIN ADC1_Init 2 */
 
+  /* ADCの自己校正（ADC無効状態・レギュレータ有効状態で実施する必要がある）。
+     これを行わないとオフセット誤差がそのまま温度誤差になる。 */
+  if (HAL_ADCEx_Calibration_Start(&hadc1, ADC_SINGLE_ENDED) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
   /* USER CODE END ADC1_Init 2 */
 
 }
